@@ -831,7 +831,7 @@
     <string name="latest_chapter">Latest chapter</string>
     <string name="total_read_time">Total read time</string>
     <string name="reading_rate">Reading rate</string>
-    <string name="minutes_per_chapter_short" translatable="false">%1$s min/ch</string>
+    <string name="minutes_per_chapter_short">%1$s min/ch</string>
     <string name="other_manga">Other manga</string>
     <string name="less_than_minute">Less than a minute</string>
     <string name="statistics">Statistics</string>

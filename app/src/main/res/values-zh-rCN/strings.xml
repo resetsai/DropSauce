@@ -741,4 +741,10 @@
     <string name="stats_range_3months">最近 13 周</string>
     <string name="stats_range_year">最近 12 个月</string>
     <string name="stats_range_all">所有时间</string>
+    <string name="default_category_sort">全部分类的默认排序</string>
+    <string name="download_default_directory">默认书籍目录</string>
+    <string name="private_app_directory_warning">卸载应用时，此目录中的文件也会被删除</string>
+    <string name="reading_rate">阅读速度</string>
+    <string name="minutes_per_chapter_short">%s 分/章</string>
+    <string name="eye_reminder">护眼提醒</string>
 </resources>

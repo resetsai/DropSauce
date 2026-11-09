@@ -21,4 +21,7 @@
     <plurals name="minutes">
         <item quantity="other">%1$d 分钟</item>
     </plurals>
+    <plurals name="stats_days"><item quantity="other">%1$d 天</item></plurals>
+    <plurals name="stats_range_months"><item quantity="other">最近 %1$d 个月</item></plurals>
+    <plurals name="stats_titles"><item quantity="other">%1$d 本</item></plurals>
 </resources>

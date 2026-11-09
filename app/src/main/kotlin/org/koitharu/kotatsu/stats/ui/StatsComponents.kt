@@ -197,7 +197,7 @@ internal fun ActivityBarChart(
 			modifier = Modifier
 				.fillMaxWidth()
 				.height(132.dp)
-				.pointerInput(buckets.size) {
+				.pointerInput(buckets.size, selectedIndex) {
 					detectTapGestures { offset ->
 						if (buckets.isEmpty()) return@detectTapGestures
 						val slot = size.width.toFloat() / buckets.size
@@ -209,11 +209,11 @@ internal fun ActivityBarChart(
 			if (buckets.isEmpty()) return@Canvas
 			val slot = size.width / buckets.size
 			val gap = (slot * 0.28f).coerceAtMost(with(density) { 8.dp.toPx() })
-			val barWidth = (slot - gap).coerceAtLeast(2f)
+			val barWidth = (slot - gap).coerceIn(1f, 26.dp.toPx())
 			val radius = CornerRadius(barWidth / 2f, barWidth / 2f)
-			val minBar = barWidth.coerceAtMost(size.height)
+			val minBar = 2.dp.toPx().coerceAtMost(size.height)
 			buckets.forEachIndexed { index, bucket ->
-				val left = index * slot + gap / 2f
+				val left = index * slot + (slot - barWidth) / 2f
 				drawRoundRect(
 					color = trackColor,
 					topLeft = Offset(left, 0f),
