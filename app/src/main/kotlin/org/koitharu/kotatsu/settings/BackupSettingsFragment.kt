@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -33,10 +31,8 @@ import org.koitharu.kotatsu.backup.local.domain.BackupUtils
 import org.koitharu.kotatsu.backup.local.ui.backup.BackupService
 import org.koitharu.kotatsu.backup.local.ui.periodical.PeriodicalBackupSettingsFragment
 import org.koitharu.kotatsu.backup.local.ui.restore.RestoreDialogFragment
-import org.koitharu.kotatsu.core.ui.dialog.showConfirmDialog
 import org.koitharu.kotatsu.core.util.ext.checkNotificationPermission
 import org.koitharu.kotatsu.core.util.ext.getDisplayMessage
-import org.koitharu.kotatsu.core.util.ext.observeEvent
 import org.koitharu.kotatsu.kotatsumigration.ui.showMissingSourcesDialog
 import org.koitharu.kotatsu.settings.compose.ActionSettingsItem
 import org.koitharu.kotatsu.settings.compose.BaseComposeSettingsFragment

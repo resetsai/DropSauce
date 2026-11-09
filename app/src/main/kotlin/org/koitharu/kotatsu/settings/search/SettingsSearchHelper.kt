@@ -172,7 +172,6 @@ class SettingsSearchHelper @Inject constructor(
 			}
 			group(sectionCrumbs, ctx.getString(R.string.other_apps)) { crumbs ->
 				addItem("restore_backup", R.string.restore_from_tachiyomi, R.string.restore_tachiyomi_summary, crumbs, BackupSettingsFragment::class.java)
-				addItem("migrate_from_kotatsu", R.string.migrate_from_kotatsu, breadcrumbs = crumbs, fragmentClass = BackupSettingsFragment::class.java, keywordText = listOf("kotatsu"))
 				addItem("export_to_mihon", R.string.export_to_mihon, R.string.export_to_mihon_summary, crumbs, BackupSettingsFragment::class.java, keywordText = listOf("mihon", "tachiyomi", "tachibk", "export"))
 			}
 		}

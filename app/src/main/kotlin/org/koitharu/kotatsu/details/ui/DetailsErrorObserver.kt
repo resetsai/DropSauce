@@ -10,7 +10,6 @@ import org.koitharu.kotatsu.core.util.ext.getDisplayMessage
 import org.koitharu.kotatsu.core.util.ext.isNetworkError
 import org.koitharu.kotatsu.core.util.ext.isSerializable
 import org.koitharu.kotatsu.parsers.exception.NotFoundException
-import org.koitharu.kotatsu.parsers.exception.ParseException
 
 class DetailsErrorObserver(
 	override val activity: androidx.fragment.app.FragmentActivity,
