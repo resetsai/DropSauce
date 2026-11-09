@@ -24,8 +24,7 @@ enum class NavItem(
 	;
 
 	fun isAvailable(settings: AppSettings): Boolean = when (this) {
-		SUGGESTIONS -> settings.isSuggestionsEnabled
-		UPDATED, FEED -> settings.isTrackerEnabled
+		EXPLORE, SUGGESTIONS, UPDATED, FEED -> false
 		else -> true
 	}
 }

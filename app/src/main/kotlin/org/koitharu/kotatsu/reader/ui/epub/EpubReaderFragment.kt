@@ -163,9 +163,6 @@ class EpubReaderFragment : BaseReaderFragment<FragmentReaderEpubBinding>() {
 	@Inject
 	lateinit var bookmarksRepository: BookmarksRepository
 	@Inject
-	@BaseHttpClient
-	lateinit var httpClient: OkHttpClient
-	@Inject
 	lateinit var imageLoader: ImageLoader
 
 	@Inject
@@ -1130,8 +1127,6 @@ class EpubReaderFragment : BaseReaderFragment<FragmentReaderEpubBinding>() {
 		override fun onCreateActionMode(mode: ActionMode?, menu: Menu): Boolean {
 			textView.parent?.requestDisallowInterceptTouchEvent(true)
 			pagerView?.isUserInputEnabled = false
-			menu.add(Menu.NONE, ACTION_DICTIONARY, Menu.NONE, R.string.dictionary)
-				.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
 			menu.add(Menu.NONE, ACTION_HIGHLIGHT, Menu.NONE, R.string.highlight)
 				.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
 			menu.add(Menu.NONE, ACTION_REMOVE_HIGHLIGHT, Menu.NONE, R.string.remove_highlight_action)
@@ -1144,12 +1139,6 @@ class EpubReaderFragment : BaseReaderFragment<FragmentReaderEpubBinding>() {
 		override fun onActionItemClicked(mode: ActionMode?, item: MenuItem): Boolean {
 			val selection = selectedText(textView) ?: return false
 			return when (item.itemId) {
-				ACTION_DICTIONARY -> {
-					showDictionary(selection.text)
-					mode?.finish()
-					true
-				}
-
 				ACTION_HIGHLIGHT -> {
 					addHighlight(selection)
 					mode?.finish()
@@ -1351,87 +1340,6 @@ class EpubReaderFragment : BaseReaderFragment<FragmentReaderEpubBinding>() {
 		) {
 			removeHighlight(bookmarkId)
 		}
-	}
-
-	private fun showDictionary(word: String) {
-		val binding = SheetEpubDictionaryBinding.inflate(layoutInflater)
-		val dialog = BottomSheetDialog(requireContext())
-		binding.textViewWord.text = word
-		binding.buttonClose.setOnClickListener { dialog.dismiss() }
-		dialog.setContentView(binding.root)
-		dialog.show()
-		viewLifecycleOwner.lifecycleScope.launch {
-			val result = runCatching {
-				withContext(Dispatchers.IO) { loadDictionary(word) }
-			}
-			if (!dialog.isShowing) return@launch
-			binding.progressBar.isVisible = false
-			binding.scrollViewContent.isVisible = true
-			val entry = result.getOrNull()
-			binding.textViewContent.text = when {
-				result.isFailure -> getString(R.string.dictionary_error)
-				entry == null -> getString(R.string.dictionary_not_found)
-				else -> formatDictionaryEntry(entry)
-			}
-			binding.textViewPhonetic.text = entry?.phonetic.orEmpty()
-			binding.textViewPhonetic.isVisible = !entry?.phonetic.isNullOrBlank()
-			binding.textViewSource.isVisible = entry != null
-		}
-	}
-
-	private fun loadDictionary(word: String): DictionaryEntry? {
-		val url = DICTIONARY_URL.toHttpUrl().newBuilder().addPathSegment(word).build()
-		val request = Request.Builder().url(url).build()
-		val body = httpClient.newCall(request).execute().use { response ->
-			if (response.code == 404) return null
-			check(response.isSuccessful) { "Dictionary request failed: ${response.code}" }
-			response.body.string()
-		}
-		return parseDictionaryEntry(body)
-	}
-
-	private fun parseDictionaryEntry(body: String): DictionaryEntry? {
-		val entry = Json.parseToJsonElement(body).jsonArray.firstOrNull()?.jsonObject ?: return null
-		val meanings = entry["meanings"]?.jsonArray.orEmpty().mapNotNull { meaningElement ->
-			val meaning = meaningElement.jsonObject
-			val definitions = meaning["definitions"]?.jsonArray.orEmpty().mapNotNull { definitionElement ->
-				val definition = definitionElement.jsonObject
-				val text = definition["definition"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null
-				DictionaryDefinition(text, definition["example"]?.jsonPrimitive?.contentOrNull)
-			}.take(MAX_DEFINITIONS_PER_MEANING)
-			if (definitions.isEmpty()) return@mapNotNull null
-			DictionaryMeaning(
-				partOfSpeech = meaning["partOfSpeech"]?.jsonPrimitive?.contentOrNull.orEmpty(),
-				definitions = definitions,
-				synonyms = meaning["synonyms"]?.jsonArray.orEmpty()
-					.mapNotNull { it.jsonPrimitive.contentOrNull }.take(MAX_SYNONYMS),
-			)
-		}.take(MAX_MEANINGS)
-		if (meanings.isEmpty()) return null
-		return DictionaryEntry(
-			phonetic = entry["phonetic"]?.jsonPrimitive?.contentOrNull.orEmpty(),
-			meanings = meanings,
-		)
-	}
-
-	private fun formatDictionaryEntry(entry: DictionaryEntry): CharSequence {
-		val text = SpannableStringBuilder()
-		entry.meanings.forEachIndexed { meaningIndex, meaning ->
-			if (meaningIndex > 0) text.append("\n\n")
-			val headingStart = text.length
-			text.append(meaning.partOfSpeech.ifBlank { getString(R.string.dictionary) })
-			text.setSpan(StyleSpan(Typeface.BOLD), headingStart, text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-			meaning.definitions.forEachIndexed { index, definition ->
-				text.append("\n${index + 1}. ${definition.text}")
-				definition.example?.takeIf(String::isNotBlank)?.let {
-					text.append("\n   ${getString(R.string.dictionary_example)}: “$it”")
-				}
-			}
-			if (meaning.synonyms.isNotEmpty()) {
-				text.append("\n${getString(R.string.dictionary_synonyms)}: ${meaning.synonyms.joinToString()}")
-			}
-		}
-		return text
 	}
 
 	private fun currentLocator(): Locator {
@@ -2093,13 +2001,8 @@ class EpubReaderFragment : BaseReaderFragment<FragmentReaderEpubBinding>() {
 		}
 
 		override fun imageData(chapterUrl: String, source: String): Any? {
-			// A downloaded novel keeps its illustrations as absolute urls; let coil fetch those. Inline
-			// data: images too - resolving one against the site turned it into a 404.
-			if (source.startsWith("http://", true) || source.startsWith("https://", true) ||
-				source.startsWith("data:", true)
-			) {
-				return source
-			}
+			if (source.startsWith("data:", true)) return source
+			if (source.startsWith("//") || source.toUri().scheme != null) return null
 			val uri = chapterUrl.toUri()
 			if (uri.isZipUri()) {
 				val entryName = resolveEpubEntry(uri.fragment.orEmpty(), source)
@@ -2121,17 +2024,7 @@ class EpubReaderFragment : BaseReaderFragment<FragmentReaderEpubBinding>() {
 		}
 
 		override fun resolveExternalLink(chapterUrl: String, href: String): String? {
-			val uri = chapterUrl.toUri()
-			if (uri.isZipUri()) {
-				return href.takeIf { it.startsWith("http://", true) || it.startsWith("https://", true) }
-			}
-			if (repository == null) return null
-			return when (val novelSource = repository.source.unwrap()) {
-				is LnMangaSource -> novelSource.absoluteUrl(href)
-				is MihonMangaSource -> (novelSource.catalogueSource as? HttpSource)
-					?.let { resolveAgainst(it.baseUrl, href) }
-				else -> null
-			}
+			return null
 		}
 
 		override fun close() {

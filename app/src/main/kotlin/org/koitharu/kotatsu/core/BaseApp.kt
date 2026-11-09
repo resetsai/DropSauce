@@ -93,15 +93,6 @@ open class BaseApp : Application(), Configuration.Provider {
 		if (ACRA.isACRASenderServiceProcess()) {
 			return
 		}
-		// Link handling is no longer a setting; re-enable the alias for users who turned it off before.
-		val linksAlias = ComponentName(this, "org.koitharu.kotatsu.details.ui.DetailsByLinkActivity")
-		if (packageManager.getComponentEnabledSetting(linksAlias) == PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
-			packageManager.setComponentEnabledSetting(
-				linksAlias,
-				PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-				PackageManager.DONT_KILL_APP,
-			)
-		}
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
 			// The system keeps it between launches; this only catches up after a restore or sync, off the main thread.
 			processLifecycleScope.launch(Dispatchers.Default) { applyNightMode(settings.theme) }

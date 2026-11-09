@@ -95,14 +95,6 @@ fun showTtsVoicesDialog(context: Context, tts: ReaderTts, onClosed: () -> Unit) 
 					}
 				}
 			},
-			footer = {
-				ExpressivePillButton(
-					text = stringResource(R.string.tts_get_more_voices),
-					icon = painterResource(R.drawable.ic_download),
-					primary = false,
-					onClick = { context.openVoiceDownloads(tts.installVoicesIntent()) },
-				)
-			},
 		) {
 			VoiceRow(
 				index = 0,

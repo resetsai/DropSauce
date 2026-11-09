@@ -81,7 +81,6 @@ import org.koitharu.kotatsu.local.ui.LocalStorageCleanupWorker
 import org.koitharu.kotatsu.main.ui.owners.AppBarOwner
 import org.koitharu.kotatsu.main.ui.owners.BottomNavOwner
 import org.koitharu.kotatsu.main.ui.owners.ListCheckpointOwner
-import org.koitharu.kotatsu.main.ui.welcome.OnboardingActivity
 import org.koitharu.kotatsu.parsers.model.Manga
 import org.koitharu.kotatsu.remotelist.ui.MangaSearchMenuProvider
 import org.koitharu.kotatsu.search.ui.suggestion.SearchSuggestionListenerImpl
@@ -133,11 +132,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), AppBarOwner, BottomNav
 			}
 		} else {
 			R.style.Theme_Kotatsu_Splash
-		}
-		if (!settings.isOnboardingCompleted) {
-			startActivity(Intent(this, OnboardingActivity::class.java))
-			finish()
-			return
 		}
 		// Before Android 12 the library would replay it on every recreation; later the system only calls it after a real splash
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S || savedInstanceState == null) {
@@ -449,11 +443,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), AppBarOwner, BottomNav
 			}
 			withResumed {
 				try {
-					MangaPrefetchService.prefetchLast(this@MainActivity)
 					startService(Intent(this@MainActivity, LocalIndexUpdateService::class.java))
-					if (settings.isAdBlockEnabled) {
-						startService(Intent(this@MainActivity, AdListUpdateService::class.java))
-					}
 				} catch (e: IllegalStateException) {
 					// BackgroundServiceStartNotAllowedException if AMS hasn't completed process state transition
 					e.printStackTraceDebug()

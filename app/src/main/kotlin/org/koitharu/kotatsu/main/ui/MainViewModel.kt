@@ -97,11 +97,7 @@ class MainViewModel @Inject constructor(
 		valueProducer = { isIncognitoModeEnabled },
 	)
 
-	init {
-		launchJob {
-			appUpdateRepository.fetchUpdate()
-		}
-	}
+
 
 	fun openLastReader() {
 		launchLoadingJob(Dispatchers.Default) {

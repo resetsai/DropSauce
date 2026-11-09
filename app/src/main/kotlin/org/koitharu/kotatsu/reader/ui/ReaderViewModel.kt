@@ -82,7 +82,6 @@ import org.koitharu.kotatsu.reader.domain.PageLoader
 import org.koitharu.kotatsu.reader.ui.config.ReaderSettings
 import org.koitharu.kotatsu.reader.ui.pager.ReaderPage
 import org.koitharu.kotatsu.reader.ui.pager.ReaderUiState
-import org.koitharu.kotatsu.scrobbling.discord.ui.DiscordRpc
 import org.koitharu.kotatsu.stats.domain.StatsCollector
 import java.io.File
 import java.time.Instant
@@ -106,7 +105,6 @@ class ReaderViewModel @Inject constructor(
     private val historyUpdateUseCase: HistoryUpdateUseCase,
     private val detectReaderModeUseCase: DetectReaderModeUseCase,
     private val statsCollector: StatsCollector,
-    private val discordRpc: DiscordRpc,
     private val deleteReadChaptersUseCase: DeleteReadChaptersUseCase,
     @LocalStorageChanges localStorageChanges: SharedFlow<LocalManga?>,
     interactor: DetailsInteractor,
@@ -278,11 +276,9 @@ class ReaderViewModel @Inject constructor(
     }
 
     fun onStop() {
-        discordRpc.clearRpc()
     }
 
     fun onIdle() {
-        discordRpc.setIdle()
     }
 
     fun switchMode(newMode: ReaderMode) {
@@ -794,10 +790,7 @@ class ReaderViewModel @Inject constructor(
         uiState.value = newState
         if (isIncognitoMode.value == false) {
             statsCollector.onStateChanged(m.id, state, totalPages)
-            // Only http(s) covers work on Discord (URL override or source default); a local custom
-            // image can't be reached by Discord's servers, so fall back to the source cover.
-            val discordCover = m.toManga().coverUrl?.takeIf { it.isHttpUrl() } ?: m.sourceManga.coverUrl
-            discordRpc.updateRpc(m.toManga(), newState, discordCover)
+
         }
     }
 

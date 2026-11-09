@@ -64,10 +64,7 @@ class LnPluginManager @Inject constructor(
 	}
 
 	private fun scan() {
-		state.value = root.listFiles { file: File -> file.isDirectory }
-			?.mapNotNull { dir -> readPlugin(dir)?.let(::LnMangaSource) }
-			?.sortedBy { it.displayName.lowercase() }
-			.orEmpty()
+		state.value = emptyList()
 	}
 
 	fun getAll(): List<LnMangaSource> = state.value
@@ -76,14 +73,7 @@ class LnPluginManager @Inject constructor(
 
 	/** Loads [pluginId]'s code into the JS realm if it is not there yet. Safe to call repeatedly. */
 	suspend fun ensureLoaded(pluginId: String) {
-		if (pluginId in loaded) return
-		loadMutex.withLock {
-			if (pluginId in loaded) return
-			val code = codeFile(pluginId).takeIf { it.isFile }?.readText()
-				?: error("Plugin $pluginId is not installed")
-			jsHost.install(pluginId, code)
-			loaded.add(pluginId)
-		}
+		throw UnsupportedOperationException("Novel plugins are disabled")
 	}
 
 	/**
@@ -101,28 +91,7 @@ class LnPluginManager @Inject constructor(
 		lang: String = "",
 		storeId: String? = null,
 	): LnPlugin {
-		val reported = LnPlugin.fromJson(jsHost.install(pluginId, rawCode))
-		val metadata = reported.copy(
-			iconUrl = reported.iconUrl.ifEmpty { iconUrl },
-			lang = reported.lang.ifEmpty { lang },
-			storeId = storeId,
-		)
-		loadMutex.withLock {
-			val dir = File(root, pluginId)
-			dir.mkdirs()
-			// Stage then rename, like MihonExtensionLoader.installPrivateExtensionFile, so an
-			// interrupted write cannot leave a half-truncated plugin behind.
-			val staged = File(dir, "$FILE_CODE.new")
-			staged.writeText(rawCode)
-			if (!staged.renameTo(codeFile(pluginId))) {
-				staged.delete()
-				error("Could not write plugin $pluginId")
-			}
-			File(dir, FILE_MANIFEST).writeText(metadata.toJson().toString())
-			loaded.add(pluginId)
-		}
-		scan()
-		return metadata
+		throw UnsupportedOperationException("Novel plugins are disabled")
 	}
 
 	suspend fun uninstall(pluginId: String) {

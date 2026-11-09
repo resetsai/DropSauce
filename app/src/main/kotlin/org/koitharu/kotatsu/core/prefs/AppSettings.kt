@@ -139,11 +139,11 @@ class AppSettings @Inject constructor(@ApplicationContext context: Context) {
 		get() {
 			val raw = prefs.getString(KEY_NAV_MAIN, null)?.split(',')
 			val items = if (raw.isNullOrEmpty()) {
-				listOf(NavItem.FAVORITES, NavItem.FEED, NavItem.HISTORY, NavItem.EXPLORE)
+				listOf(NavItem.LOCAL, NavItem.FAVORITES, NavItem.HISTORY, NavItem.BOOKMARKS)
 			} else {
 				raw.mapNotNull { x -> NavItem.entries.find(x) }.ifEmpty { listOf(NavItem.EXPLORE) }
 			}
-			return items.take(4)
+			return items.filter { it.isAvailable(this) }.ifEmpty { listOf(NavItem.LOCAL) }.take(4)
 		}
 		set(value) {
 			prefs.edit {
@@ -1546,6 +1546,7 @@ class AppSettings @Inject constructor(@ApplicationContext context: Context) {
 		 * Stripped from local backups and cloud sync, both when writing and when applying.
 		 */
 		val SENSITIVE_BACKUP_KEYS = setOf(
+			KEY_DISCORD_TOKEN,
 			KEY_APP_PASSWORD,
 			KEY_APP_PASSWORD_SALT,
 			KEY_APP_PASSWORD_NUMERIC_OLD,

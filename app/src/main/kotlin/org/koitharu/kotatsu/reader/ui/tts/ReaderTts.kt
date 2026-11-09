@@ -81,7 +81,7 @@ class ReaderTts @Inject constructor(
 		val country = Locale.getDefault().country
 		return all
 			// Google's "<lang>-language" entry is an alias of whichever voice is the engine default
-			.filter { !it.isInstallRequired() && it.locale.isSameLanguage(spoken) && LEGACY_LANGUAGE_VOICE !in it.features.orEmpty() }
+			.filter { !it.isNetworkConnectionRequired && !it.isInstallRequired() && it.locale.isSameLanguage(spoken) && LEGACY_LANGUAGE_VOICE !in it.features.orEmpty() }
 			.sortedWith(
 				compareBy<Voice> { it.isNetworkConnectionRequired }
 					.thenBy { !it.locale.country.equals(country, ignoreCase = true) }
@@ -109,7 +109,7 @@ class ReaderTts @Inject constructor(
 		}
 		engine.setSpeechRate(settings.epubTtsSpeed)
 		engine.setPitch(settings.epubTtsPitch)
-		engine.voice = voice
+		if (voice.isNetworkConnectionRequired || engine.setVoice(voice) != TextToSpeech.SUCCESS) return
 		_previewingVoice.value = voice.name
 		engine.speak(sampleText(), TextToSpeech.QUEUE_FLUSH, null, PREVIEW_UTTERANCE_PREFIX + voice.name)
 	}
@@ -244,10 +244,10 @@ class ReaderTts @Inject constructor(
 		// the phone's region instead (say English India) ignored that pick (say an en-US voice).
 		val spoken = spokenLocale()
 		val phoneVoice = runCatching { engine.defaultVoice }.getOrNull()
-		if (phoneVoice != null && phoneVoice.locale.isSameLanguage(spoken)) {
+		if (phoneVoice != null && !phoneVoice.isNetworkConnectionRequired && phoneVoice.locale.isSameLanguage(spoken)) {
 			engine.voice = phoneVoice
 		} else {
-			engine.language = spoken
+			availableVoices().firstOrNull()?.let { engine.voice = it } ?: run { engine.language = spoken }
 		}
 	}
 
@@ -290,6 +290,10 @@ class ReaderTts @Inject constructor(
 			return
 		}
 		applySettings()
+		if (engine.voice?.isNetworkConnectionRequired != false) {
+			_isPlaying.value = false
+			return
+		}
 		engine.stop()
 		_isPlaying.value = true
 		spokenPrefix = skipChars

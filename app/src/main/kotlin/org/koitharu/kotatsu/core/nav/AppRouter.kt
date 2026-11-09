@@ -365,26 +365,7 @@ class AppRouter private constructor(
 
     @CheckResult
     fun openExternalBrowser(url: String, chooserTitle: CharSequence? = null): Boolean {
-        val context = contextOrNull() ?: return false
-        val intent = Intent(Intent.ACTION_VIEW, url.toUriOrNull() ?: return false)
-            .addCategory(Intent.CATEGORY_BROWSABLE)
-        val packageManager = context.packageManager
-        val defaultPackage = packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
-            ?.activityInfo?.packageName
-            ?.takeUnless { it == context.packageName }
-        val browserPackage = defaultPackage ?: packageManager
-            .queryIntentActivities(intent, PackageManager.MATCH_ALL)
-            .firstOrNull { it.activityInfo.packageName != context.packageName }
-            ?.activityInfo?.packageName
-            ?: return false
-        intent.setPackage(browserPackage)
-        return startActivitySafe(
-            if (!chooserTitle.isNullOrEmpty()) {
-                Intent.createChooser(intent, chooserTitle)
-            } else {
-                intent
-            },
-        )
+        return false
     }
 
     /** Dialogs **/

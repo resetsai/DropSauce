@@ -45,7 +45,6 @@ import org.koitharu.kotatsu.settings.search.SettingsSearchViewModel
 import org.koitharu.kotatsu.settings.sources.ExtensionsSettingsFragment
 import org.koitharu.kotatsu.settings.sources.SourceSettingsFragment
 import org.koitharu.kotatsu.settings.tracker.TrackerSettingsFragment
-import org.koitharu.kotatsu.sync.ui.SyncSettingsFragment
 
 @AndroidEntryPoint
 class SettingsActivity :
@@ -178,25 +177,6 @@ class SettingsActivity :
 	private fun openDefaultFragment() {
 		val fragment = when (intent?.action) {
 			AppRouter.ACTION_READER -> ReaderSettingsFragment()
-			AppRouter.ACTION_SUGGESTIONS -> SuggestionsSettingsFragment()
-			AppRouter.ACTION_TRACKER -> TrackerSettingsFragment()
-			AppRouter.ACTION_SYNC -> SyncSettingsFragment()
-			AppRouter.ACTION_SOURCES -> ExtensionsSettingsFragment()
-			AppRouter.ACTION_MANAGE_DISCORD -> DiscordSettingsFragment()
-			AppRouter.ACTION_PROXY -> ProxySettingsFragment()
-			AppRouter.ACTION_MANAGE_DOWNLOADS -> DownloadsSettingsFragment()
-			AppRouter.ACTION_SOURCE -> SourceSettingsFragment.newInstance(
-				MangaSource(intent.getStringExtra(AppRouter.KEY_SOURCE)),
-				intent.getBooleanExtra(AppRouter.KEY_SCROLL_TO_LANGUAGE, false),
-			)
-
-			Intent.ACTION_VIEW -> {
-				when (intent.data?.host) {
-					HOST_ABOUT -> AboutSettingsFragment()
-					else -> null
-				}
-			}
-
 			else -> null
 		} ?: if (isMasterDetails) AppearanceSettingsFragment() else RootSettingsFragment()
 		supportFragmentManager.commit {

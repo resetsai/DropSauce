@@ -68,38 +68,7 @@ interface NetworkModule {
 			proxyProvider: ProxyProvider,
 		): OkHttpClient = OkHttpClient.Builder().apply {
 			assertNotInMainThread()
-			// Every client in the app is derived from this one with newBuilder(), so they all share
-			// this dispatcher, and it only governs async (enqueued) calls - which is every page, cover
-			// and extension request. OkHttp's default of 5 per host is exactly the per-chapter page
-			// parallelism one download uses, leaving nothing for the reader or covers to the same host:
-			// they queued behind it instead of running. 8 keeps a browser-like posture (6-8 per host)
-			// while leaving room for reading during a download; callers stay the real limit.
-			dispatcher(
-				Dispatcher().apply {
-					maxRequests = 64
-					maxRequestsPerHost = 8
-				},
-			)
-			connectTimeout(20, TimeUnit.SECONDS)
-			readTimeout(60, TimeUnit.SECONDS)
-			writeTimeout(20, TimeUnit.SECONDS)
-			cookieJar(cookieJar)
-			proxySelector(proxyProvider.selector)
-			proxyAuthenticator(proxyProvider.authenticator)
-			dns(DoHManager(cache, settings))
-			if (settings.isSSLBypassEnabled) {
-				disableCertificateVerification()
-			} else {
-				installExtraCertificates(contextProvider.get())
-			}
-			cache(cache)
-			addInterceptor(RecordingHttpLogInterceptor()) // outermost: sees each call's final outcome
-			addInterceptor(GZipInterceptor())
-			addInterceptor(CloudFlareInterceptor())
-			addInterceptor(RateLimitInterceptor())
-			if (BuildConfig.DEBUG) {
-				addInterceptor(CurlLoggingInterceptor())
-			}
+			addInterceptor { throw java.io.IOException("Network access is disabled") }
 		}.build()
 
 		@Provides

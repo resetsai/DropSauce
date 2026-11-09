@@ -95,96 +95,13 @@ interface MangaRepository {
 	@Singleton
 	class Factory @Inject constructor(
 		private val localMangaRepository: LocalMangaRepository,
-		private val contentCache: MemoryContentCache,
-		private val mihonExtensionManager: MihonExtensionManager,
-		private val lnPluginManager: LnPluginManager,
-		private val jsHost: JsHost,
-		@ApplicationContext private val context: Context,
 	) {
-
-		private val cache = ArrayMap<MangaSource, WeakReference<MangaRepository>>()
-
 		@AnyThread
 		fun create(source: MangaSource): MangaRepository {
-			val unwrapped = resolveFreshSource(unwrap(source))
-			val isExternalMissing = unwrapped is MissingMangaSource && unwrapped.name.startsWith("MIHON_")
-			when (unwrapped) {
-				LocalMangaSource -> return localMangaRepository
-				UnknownMangaSource -> return EmptyMangaRepository(unwrapped)
-				is MihonMangaSource -> mihonExtensionManager.initialize()
-				is LnMangaSource -> lnPluginManager.initialize()
-			}
-			if (isExternalMissing) {
-				// Don't reuse a stale `EmptyMangaRepository`: it would throw forever. The
-				// lazy proxy is reusable across resolutions and self-heals once extensions
-				// finish loading, so we keep it cached.
-				cache[unwrapped]?.get()?.let { cached ->
-					if (cached !is EmptyMangaRepository) return cached
-				}
-				return synchronized(cache) {
-					cache[unwrapped]?.get()?.let { cached ->
-						if (cached !is EmptyMangaRepository) return cached
-					}
-					val lazyRepo = LazyMihonMangaRepository(
-						source = unwrapped,
-						extensionManager = mihonExtensionManager,
-						cache = contentCache,
-						context = context,
-					)
-					cache[unwrapped] = WeakReference(lazyRepo)
-					lazyRepo
-				}
-			}
-			cache[unwrapped]?.get()?.let { return it }
-			return synchronized(cache) {
-				cache[unwrapped]?.get()?.let { return it }
-				val repository = createRepository(unwrapped)
-				if (repository != null) {
-					cache[unwrapped] = WeakReference(repository)
-					repository
-				} else {
-					EmptyMangaRepository(unwrapped).also {
-						cache[unwrapped] = WeakReference(it)
-					}
-				}
-			}
+			val actual = if (source is MangaSourceInfo) source.mangaSource else source
+			return if (actual == LocalMangaSource) localMangaRepository else EmptyMangaRepository(actual)
 		}
 
-		private fun unwrap(source: MangaSource): MangaSource = when (source) {
-			is MangaSourceInfo -> source.mangaSource
-			else -> source
-		}
-
-		private fun resolveFreshSource(source: MangaSource): MangaSource {
-			if (source is MissingMangaSource && source.name.startsWith("MIHON_")) {
-				mihonExtensionManager.initialize()
-				return ResolveMangaSource(source.name)
-			}
-			// Novel plugins are a plain directory scan, so there is no "not loaded yet" window to
-			// bridge with a lazy proxy the way LazyMihonMangaRepository does.
-			if (source is MissingMangaSource && source.name.startsWith("LN_")) {
-				lnPluginManager.initialize()
-				return ResolveMangaSource(source.name)
-			}
-			return source
-		}
-
-		private fun createRepository(source: MangaSource): MangaRepository? = when (source) {
-			is MihonMangaSource -> MihonMangaRepository(
-				source = source,
-				cache = contentCache,
-				context = context,
-			)
-
-			is LnMangaSource -> LnMangaRepository(
-				source = source,
-				cache = contentCache,
-				jsHost = jsHost,
-				pluginManager = lnPluginManager,
-			)
-
-			else -> null
-		}
 	}
 }
 
