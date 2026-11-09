@@ -152,7 +152,7 @@ class LocalListViewModel @Inject constructor(
 		EmptyState(
 			icon = R.drawable.ic_empty_local,
 			textPrimary = R.string.text_local_holder_primary,
-			textSecondary = R.string.text_local_holder_secondary,
+			textSecondary = R.string.comics_archive_import_description,
 			actionStringRes = R.string._import,
 		)
 	}
