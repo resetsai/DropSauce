@@ -44,6 +44,7 @@ import com.google.android.material.R as materialR
  * this every tab puts the mascot at a slightly different height.
  */
 fun View.centerContentOnDisplay() {
+	if (this is org.koitharu.kotatsu.list.ui.EmptyStateLayout) return
 	doOnLayout {
 		val top = IntArray(2).also(::getLocationOnScreen)[1]
 		val available = resources.displayMetrics.heightPixels - top * 2
