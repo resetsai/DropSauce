@@ -31,7 +31,6 @@ import org.koitharu.kotatsu.core.logs.UserActionLogger
 import org.koitharu.kotatsu.core.logs.breadcrumb
 import org.koitharu.kotatsu.core.os.AppValidator
 import org.koitharu.kotatsu.core.os.RomCompat
-import org.koitharu.kotatsu.settings.sources.catalog.EXTENSION_APK_PREFIX
 import org.koitharu.kotatsu.core.prefs.AppSettings
 import org.koitharu.kotatsu.core.ui.DefaultActivityLifecycleCallbacks
 import org.koitharu.kotatsu.core.ui.dialog.CrashDialogActivity
@@ -167,7 +166,7 @@ open class BaseApp : Application(), Configuration.Provider {
 	private fun cleanupDownloadedExtensionApks() {
 		runCatching {
 			cacheDir.listFiles()?.forEach { file ->
-				if (file.isFile && file.name.startsWith(EXTENSION_APK_PREFIX)) {
+				if (file.isFile && file.name.startsWith("extension_")) {
 					file.delete()
 				}
 			}

@@ -49,18 +49,19 @@ class DetailsMenuProvider(
 
 	override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
 		menuInflater.inflate(R.menu.opt_details, menu)
+		menu.removeItem(R.id.action_related)
 	}
 
 	override fun onPrepareMenu(menu: Menu) {
 		val manga = viewModel.manga.value
 		menu.findItem(R.id.action_share).isVisible = manga != null && AppRouter.isShareSupported(manga)
-		menu.findItem(R.id.action_save).isVisible = manga?.source != null && manga.source != LocalMangaSource
+		menu.findItem(R.id.action_save).isVisible = false
 		menu.findItem(R.id.action_delete).isVisible = manga?.source == LocalMangaSource
-		menu.findItem(R.id.action_browser).isVisible = manga?.publicUrl?.isHttpUrl() == true
-		menu.findItem(R.id.action_alternatives).isVisible = manga?.source != LocalMangaSource
+		menu.findItem(R.id.action_browser).isVisible = false
+		menu.findItem(R.id.action_alternatives).isVisible = false
 		menu.findItem(R.id.action_shortcut).isVisible = ShortcutManagerCompat.isRequestPinShortcutSupported(activity)
-		menu.findItem(R.id.action_scrobbling).isVisible = viewModel.isScrobblingAvailable
-		menu.findItem(R.id.action_online).isVisible = viewModel.remoteManga.value != null
+		menu.findItem(R.id.action_scrobbling).isVisible = false
+		menu.findItem(R.id.action_online).isVisible = false
 		menu.findItem(R.id.action_stats).isVisible = viewModel.isStatsAvailable.value
 		// Novels and local books only — there is nothing to put in an epub for an image manga.
 		menu.findItem(R.id.action_export_epub).isVisible = manga?.isEpub == true

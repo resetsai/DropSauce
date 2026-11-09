@@ -11,14 +11,12 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.plus
 import org.koitharu.kotatsu.core.exceptions.EmptyHistoryException
-import org.koitharu.kotatsu.core.github.AppUpdateRepository
 import org.koitharu.kotatsu.core.prefs.AppSettings
 import org.koitharu.kotatsu.core.prefs.observeAsFlow
 import org.koitharu.kotatsu.core.prefs.observeAsStateFlow
 import org.koitharu.kotatsu.core.ui.BaseViewModel
 import org.koitharu.kotatsu.core.util.ext.MutableEventFlow
 import org.koitharu.kotatsu.core.util.ext.call
-import org.koitharu.kotatsu.extensions.install.ExtensionUpdateWorker
 import org.koitharu.kotatsu.history.data.HistoryRepository
 import org.koitharu.kotatsu.main.domain.ReadingResumeEnabledUseCase
 import org.koitharu.kotatsu.parsers.model.Manga
@@ -29,37 +27,10 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
 	private val historyRepository: HistoryRepository,
-	private val appUpdateRepository: AppUpdateRepository,
 	trackingRepository: TrackingRepository,
 	private val settings: AppSettings,
 	readingResumeEnabledUseCase: ReadingResumeEnabledUseCase,
-	private val extensionStoreManager: ExtensionStoreManager,
-	private val extensionUpdateScheduler: ExtensionUpdateWorker.Scheduler,
 ) : BaseViewModel() {
-
-	val hasExtensionUpdates: StateFlow<Boolean> = extensionStoreManager.hasUpdates.onEach { hasUpdates ->
-		if (hasUpdates) {
-			if (settings.isPrivateInstallEnabled) {
-				extensionUpdateScheduler.startNow()
-			} else if (
-				settings.isShizukuInstallerEnabled &&
-				settings.isAutoUpdateExtensionsEnabled
-			) {
-				extensionUpdateScheduler.startNow()
-			}
-		}
-	}.flowOn(Dispatchers.IO)
-		.stateIn(
-			scope = viewModelScope + Dispatchers.IO,
-			started = SharingStarted.WhileSubscribed(5000),
-			initialValue = false
-		)
-
-	init {
-		launchJob(Dispatchers.IO) {
-			extensionStoreManager.initialize()
-		}
-	}
 
 	val onOpenReader = MutableEventFlow<Manga>()
 	val onOpenLastDetails = MutableEventFlow<Manga>()
@@ -72,7 +43,6 @@ class MainViewModel @Inject constructor(
 			initialValue = false,
 		)
 
-	val appUpdate = appUpdateRepository.observeAvailableUpdate()
 
 	// A negative counter renders as a plain dot (see MainNavigationDelegate.setCounter), which is what
 	// the "dot instead of a count" preference asks for.

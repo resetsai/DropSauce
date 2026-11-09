@@ -364,11 +364,6 @@ class ReaderActivity :
         viewModel.onPause()
     }
 
-    override fun onStop() {
-        super.onStop()
-        viewModel.onStop()
-    }
-
     override fun onDestroy() {
         // Backgrounding the reader keeps speaking; leaving it does not. A rotation is neither.
         if (isFinishing) {
@@ -387,7 +382,6 @@ class ReaderActivity :
 
     override fun onIdle() {
         viewModel.saveCurrentState(readerManager.currentReader?.getCurrentState())
-        viewModel.onIdle()
     }
 
     override fun onVisibilityChanged(v: View, visibility: Int) {

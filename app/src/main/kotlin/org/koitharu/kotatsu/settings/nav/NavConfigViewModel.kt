@@ -38,7 +38,7 @@ class NavConfigViewModel @Inject constructor(
 			snapshot.mapTo(this) {
 				NavItemConfigModel(it, getUnavailabilityHint(it))
 			}
-			if (size < NavItem.entries.size) {
+			if (size < NavItem.entries.count { it.isAvailable(settings) }) {
 				add(NavItemAddModel(size < MainNavigationDelegate.MAX_ITEM_COUNT))
 			}
 		}
@@ -52,7 +52,7 @@ class NavConfigViewModel @Inject constructor(
 
 	val availableItems
 		get() = items.value.let { snapshot ->
-			NavItem.entries.filterNot { x -> x in snapshot }
+			NavItem.entries.filter { it.isAvailable(settings) && it !in snapshot }
 		}
 
 	fun reorder(fromPos: Int, toPos: Int) {
@@ -72,7 +72,7 @@ class NavConfigViewModel @Inject constructor(
 		val newList = items.value.toMutableList()
 		newList.remove(item)
 		if (newList.isEmpty()) {
-			newList.add(NavItem.EXPLORE)
+			newList.add(NavItem.LOCAL)
 		}
 		items.value = newList
 		commit(newList)

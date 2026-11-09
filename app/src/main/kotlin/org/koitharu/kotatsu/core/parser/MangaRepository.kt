@@ -11,9 +11,7 @@ import org.koitharu.kotatsu.core.model.MissingMangaSource
 import org.koitharu.kotatsu.core.model.MangaSourceInfo
 import org.koitharu.kotatsu.core.model.UnknownMangaSource
 import org.koitharu.kotatsu.local.data.LocalMangaRepository
-import org.koitharu.kotatsu.lnreader.LnMangaRepository
 import org.koitharu.kotatsu.lnreader.LnPluginManager
-import org.koitharu.kotatsu.lnreader.js.JsHost
 import org.koitharu.kotatsu.lnreader.model.LnMangaSource
 import org.koitharu.kotatsu.mihon.LazyMihonMangaRepository
 import org.koitharu.kotatsu.mihon.MihonExtensionManager

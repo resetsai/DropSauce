@@ -60,13 +60,7 @@ interface NetworkModule {
 		@Provides
 		@Singleton
 		@BaseHttpClient
-		fun provideBaseHttpClient(
-			@ApplicationContext contextProvider: Provider<Context>,
-			cache: Cache,
-			cookieJar: CookieJar,
-			settings: AppSettings,
-			proxyProvider: ProxyProvider,
-		): OkHttpClient = OkHttpClient.Builder().apply {
+		fun provideBaseHttpClient(): OkHttpClient = OkHttpClient.Builder().apply {
 			assertNotInMainThread()
 			addInterceptor { throw java.io.IOException("Network access is disabled") }
 		}.build()

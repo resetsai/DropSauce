@@ -9,7 +9,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.json.JSONObject
-import org.koitharu.kotatsu.lnreader.js.JsHost
 import org.koitharu.kotatsu.lnreader.model.LnMangaSource
 import org.koitharu.kotatsu.lnreader.model.LnPlugin
 import java.io.File
@@ -30,7 +29,6 @@ import javax.inject.Singleton
 @Singleton
 class LnPluginManager @Inject constructor(
 	@ApplicationContext private val context: Context,
-	private val jsHost: JsHost,
 ) {
 
 	private val loadMutex = Mutex()
@@ -99,7 +97,6 @@ class LnPluginManager @Inject constructor(
 			loaded.remove(pluginId)
 			File(root, pluginId).deleteRecursively()
 		}
-		jsHost.uninstall(pluginId)
 		scan()
 	}
 

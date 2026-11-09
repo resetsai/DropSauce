@@ -46,7 +46,10 @@ class ImportDialogFragment : ComposeAlertDialogFragment() {
 	@Inject
 	lateinit var storageManager: LocalStorageManager
 
-	private val importFileCall = registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) {
+	private val importFileCall = registerForActivityResult(object : ActivityResultContracts.OpenMultipleDocuments() {
+		override fun createIntent(context: android.content.Context, input: Array<String>): android.content.Intent =
+			super.createIntent(context, input).putExtra(android.content.Intent.EXTRA_LOCAL_ONLY, true)
+	}) {
 		startImport(it)
 	}
 	private val importDirCall = OpenDocumentTreeHelper(this) {

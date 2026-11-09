@@ -69,6 +69,7 @@ class OpenDocumentTreeHelper(
 		override fun createIntent(context: Context, input: Uri?): Intent {
 			val intent = super.createIntent(context, input)
 			intent.addFlags(flags)
+			intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true)
 			return intent
 		}
 	}
@@ -86,6 +87,7 @@ class OpenDocumentTreeHelper(
 				return super.createIntent(context, input)
 			}
 			intent.addFlags(flags)
+			intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true)
 			if (input != null) {
 				intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, input)
 			}

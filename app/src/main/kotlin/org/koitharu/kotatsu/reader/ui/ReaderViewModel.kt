@@ -275,12 +275,6 @@ class ReaderViewModel @Inject constructor(
         }
     }
 
-    fun onStop() {
-    }
-
-    fun onIdle() {
-    }
-
     fun switchMode(newMode: ReaderMode) {
         readerMode.value = newMode
         // No content re-emit with getCurrentState() here: the new reader restores from readingState

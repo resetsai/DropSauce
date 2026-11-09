@@ -29,7 +29,6 @@ import org.koitharu.kotatsu.core.util.ext.observeEvent
 import org.koitharu.kotatsu.core.util.ext.printStackTraceDebug
 import org.koitharu.kotatsu.core.util.ext.withArgs
 import org.koitharu.kotatsu.databinding.FragmentListBinding
-import org.koitharu.kotatsu.extensions.install.ExtensionUpdateInstaller
 import org.koitharu.kotatsu.filter.ui.FilterCoordinator
 import org.koitharu.kotatsu.list.ui.MangaListFragment
 import org.koitharu.kotatsu.parsers.model.MangaSource
@@ -45,18 +44,6 @@ class RemoteListFragment : MangaListFragment(), FilterCoordinator.Owner {
     override val filterCoordinator: FilterCoordinator
         get() = viewModel.filterCoordinator
 
-    @Inject
-    lateinit var extensionUpdateInstallerFactory: ExtensionUpdateInstaller.Factory
-
-    private lateinit var extensionUpdateInstaller: ExtensionUpdateInstaller
-    private var updateTip: TipView? = null
-    private var isInstallingUpdate = false
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        extensionUpdateInstaller = extensionUpdateInstallerFactory.create(this)
-    }
-
     override fun onViewBindingCreated(binding: FragmentListBinding, savedInstanceState: Bundle?) {
         super.onViewBindingCreated(binding, savedInstanceState)
         addMenuProvider(RemoteListMenuProvider())
@@ -64,17 +51,11 @@ class RemoteListFragment : MangaListFragment(), FilterCoordinator.Owner {
         viewModel.isRandomLoading.observe(viewLifecycleOwner, MenuInvalidator(requireActivity()))
         viewModel.onOpenManga.observeEvent(viewLifecycleOwner) { router.openDetails(it) }
         viewModel.onBrokenSortFallback.observeEvent(viewLifecycleOwner) { showBrokenSortWarning() }
-        viewModel.extensionUpdatePackage.observe(viewLifecycleOwner, ::onExtensionUpdateChanged)
         filterCoordinator.observe().distinctUntilChangedBy { it.listFilter.isEmpty() }
             .drop(1)
             .observe(viewLifecycleOwner) {
                 activity?.invalidateMenu()
             }
-    }
-
-    override fun onDestroyView() {
-        updateTip = null
-        super.onDestroyView()
     }
 
     override fun onScrolledToEnd() {
@@ -133,51 +114,6 @@ class RemoteListFragment : MangaListFragment(), FilterCoordinator.Owner {
      * waiting. The button hands the package to the extension manager, which owns the whole
      * download-and-install flow.
      */
-    private fun onExtensionUpdateChanged(packageName: String?) {
-        val binding = viewBinding ?: return
-        if (packageName == null) {
-            updateTip?.isVisible = false
-            return
-        }
-        val tip = updateTip ?: (binding.stubTip.inflate() as TipView).also { updateTip = it }
-        tip.setIcon(R.drawable.ic_extension_update)
-        tip.setTitle(R.string.extension_update_available)
-        tip.setText(R.string.extension_update_available_summary)
-        tip.setPrimaryButtonText(R.string.update)
-        tip.setClosable(false)
-        tip.onButtonClickListener = object : TipView.OnButtonClickListener {
-            override fun onPrimaryButtonClick(tipView: TipView) = installExtensionUpdate(packageName)
-
-            override fun onSecondaryButtonClick(tipView: TipView) = Unit
-        }
-        tip.isVisible = true
-    }
-
-    /** Downloads and installs the update in place, then reloads extensions so the source picks it up. */
-    private fun installExtensionUpdate(packageName: String) {
-        if (isInstallingUpdate) {
-            return
-        }
-        isInstallingUpdate = true
-        Toast.makeText(requireContext(), R.string.download_started, Toast.LENGTH_SHORT).show()
-        viewLifecycleOwner.lifecycleScope.launch {
-            val result = runCatchingCancellable {
-                extensionUpdateInstaller.installUpdate(packageName)
-            }.onFailure {
-                it.printStackTraceDebug()
-            }.getOrDefault(ExtensionUpdateInstaller.Result.FAILED)
-            isInstallingUpdate = false
-            val message = when (result) {
-                ExtensionUpdateInstaller.Result.SUCCESS -> R.string.extension_updated
-                ExtensionUpdateInstaller.Result.NO_UPDATE -> R.string.no_update_available
-                ExtensionUpdateInstaller.Result.DOWNLOAD_FAILED -> R.string.extension_download_failed
-                ExtensionUpdateInstaller.Result.INVALID -> R.string.shizuku_invalid_package
-                ExtensionUpdateInstaller.Result.FAILED -> R.string.error_occurred
-            }
-            Snackbar.make(viewBinding?.recyclerView ?: return@launch, message, Snackbar.LENGTH_LONG).show()
-        }
-    }
-
     private fun showBrokenSortWarning() {
         Snackbar.make(
             viewBinding?.recyclerView ?: return,

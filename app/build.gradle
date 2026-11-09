@@ -211,7 +211,6 @@ dependencies {
 	implementation libs.okhttp.dnsoverhttps
 	implementation libs.okio
 	implementation libs.rxjava
-	implementation libs.quickJs
 	implementation libs.junrar
 	implementation libs.unifile
 	implementation libs.injekt.core
@@ -221,8 +220,6 @@ dependencies {
 	implementation libs.kotlinx.serialization.json
 	implementation libs.kotlinx.serialization.json.okio
 	implementation libs.kotlinx.serialization.protobuf
-	implementation libs.shizuku.api
-	implementation libs.shizuku.provider
 	// xmlutil — required by extensions that parse XML-based manga sites
 	implementation libs.xmlutil.core
 	implementation libs.xmlutil.serialization

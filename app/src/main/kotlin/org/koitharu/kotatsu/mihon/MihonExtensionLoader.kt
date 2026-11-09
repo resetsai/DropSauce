@@ -20,7 +20,6 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import org.koitharu.kotatsu.core.logs.AppLogger
 import org.koitharu.kotatsu.core.logs.breadcrumb
-import org.koitharu.kotatsu.mihon.compat.KotoInjektBridge
 import org.koitharu.kotatsu.mihon.model.MihonExtensionInfo
 import org.koitharu.kotatsu.mihon.model.MihonLoadResult
 import eu.kanade.tachiyomi.util.lang.Hash

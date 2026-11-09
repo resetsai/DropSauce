@@ -3,10 +3,6 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools">
 
-	<!-- Shizuku 13.1.5's APIs used here remain Android 6 compatible; its published AAR
-	     conservatively declares API 24 even though Shizuku itself supports API 23. -->
-	<uses-sdk tools:overrideLibrary="rikka.shizuku.api,rikka.shizuku.provider" />
-
 	<!-- Launchable on Android TV (see the banner below); neither is required on phones -->
 	<uses-feature
 		android:name="android.software.leanback"
@@ -69,7 +65,7 @@
 		android:theme="@style/Theme.Kotatsu"
 		tools:ignore="UnusedAttribute,RemoveWorkManagerInitializer">
 
-		<provider android:name="rikka.shizuku.ShizukuProvider" tools:node="remove" />
+
 
 		<activity
 			android:name="org.koitharu.kotatsu.main.ui.MainActivity"

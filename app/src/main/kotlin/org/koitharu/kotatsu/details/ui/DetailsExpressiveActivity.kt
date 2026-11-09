@@ -120,7 +120,6 @@ class DetailsExpressiveActivity :
 		viewModel.onDownloadStarted
 			.filterNot { router.isChapterPagesSheetShown() }
 			.observeEvent(this, DownloadStartedObserver(viewBinding.composeView))
-		viewModel.chapters.observe(this, PrefetchObserver(this, viewModel::getSourceMangaOrNull))
 	}
 
 	override fun onProvideAssistContent(outContent: AssistContent) {
@@ -266,17 +265,4 @@ class DetailsExpressiveActivity :
 		return insets
 	}
 
-	private class PrefetchObserver(
-		private val context: android.content.Context,
-		private val manga: () -> Manga?,
-	) : kotlinx.coroutines.flow.FlowCollector<List<ChapterListItem>?> {
-		private var isCalled = false
-		override suspend fun emit(value: List<ChapterListItem>?) {
-			if (value.isNullOrEmpty() || isCalled) return
-			val manga = manga() ?: return
-			isCalled = true
-			val item = value.find { it.isCurrent } ?: value.first()
-			MangaPrefetchService.prefetchPages(context, manga, item.chapter)
-		}
-	}
 }

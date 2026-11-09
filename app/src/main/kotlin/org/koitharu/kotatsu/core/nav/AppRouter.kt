@@ -97,11 +97,9 @@ import org.koitharu.kotatsu.search.domain.SearchKind
 import org.koitharu.kotatsu.search.ui.MangaListActivity
 import org.koitharu.kotatsu.search.ui.multi.SearchActivity
 import org.koitharu.kotatsu.settings.SettingsActivity
-import org.koitharu.kotatsu.settings.about.AppUpdateActivity
 import org.koitharu.kotatsu.settings.override.OverrideConfigActivity
 import org.koitharu.kotatsu.settings.reader.ReaderTapGridConfigActivity
 import org.koitharu.kotatsu.settings.sources.auth.SourceAuthActivity
-import org.koitharu.kotatsu.settings.sources.catalog.SourcesCatalogActivity
 import org.koitharu.kotatsu.settings.sources.catalog.stores.ExtensionStoresActivity
 import org.koitharu.kotatsu.settings.storage.MangaDirectorySelectDialog
 import org.koitharu.kotatsu.settings.storage.directories.MangaDirectoriesActivity
@@ -239,26 +237,11 @@ class AppRouter private constructor(
 
     fun openBookmarks() = startActivity(AllBookmarksActivity::class.java)
 
-    fun openAppUpdate(autoDownload: Boolean = false) {
-        val context = contextOrNull() ?: return
-        startActivity(
-            Intent(context, AppUpdateActivity::class.java)
-                .putExtra(KEY_AUTO_DOWNLOAD, autoDownload),
-        )
-    }
-
     fun openSuggestions() {
         startActivity(suggestionsIntent(contextOrNull() ?: return))
     }
 
-    fun openSourcesCatalog(autoMigrate: Boolean = false) {
-        val context = contextOrNull() ?: return
-        startActivity(
-            Intent(context, SourcesCatalogActivity::class.java).apply {
-                if (autoMigrate) putExtra(KEY_SOURCE_CATALOG_AUTO_MIGRATE, true)
-            },
-        )
-    }
+    fun openSourcesCatalog(autoMigrate: Boolean = false) = Unit
 
     fun openExtensionStores() = startActivity(ExtensionStoresActivity::class.java)
 

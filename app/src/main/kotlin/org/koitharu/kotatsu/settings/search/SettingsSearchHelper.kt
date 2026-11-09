@@ -16,10 +16,8 @@ import org.koitharu.kotatsu.settings.ReaderSettingsFragment
 import org.koitharu.kotatsu.settings.ServicesSettingsFragment
 import org.koitharu.kotatsu.settings.StorageAndNetworkSettingsFragment
 import org.koitharu.kotatsu.settings.SuggestionsSettingsFragment
-import org.koitharu.kotatsu.settings.about.AboutSettingsFragment
 import org.koitharu.kotatsu.settings.appearance.PreviewSettingsFragment
 import org.koitharu.kotatsu.settings.discord.DiscordSettingsFragment
-import org.koitharu.kotatsu.settings.sources.ExtensionsSettingsFragment
 import org.koitharu.kotatsu.settings.tracker.TrackerSettingsFragment
 import org.koitharu.kotatsu.settings.userdata.storage.DataCleanupSettingsFragment
 import javax.inject.Inject
@@ -118,29 +116,6 @@ class SettingsSearchHelper @Inject constructor(
 		}
 
 
-		section(R.string.extensions, ExtensionsSettingsFragment::class.java) { sectionCrumbs ->
-			group(sectionCrumbs, ctx.getString(R.string.auto_update)) { crumbs ->
-				addItem(AppSettings.KEY_SHIZUKU_INSTALLER, R.string.shizuku_title, R.string.shizuku_summary, crumbs, ExtensionsSettingsFragment::class.java)
-				addItem(AppSettings.KEY_AUTO_UPDATE_EXTENSIONS, R.string.ext_auto_update_title, R.string.ext_auto_update_summary, crumbs, ExtensionsSettingsFragment::class.java)
-				addItem(AppSettings.KEY_EXTENSION_UPDATE_NOTIFICATIONS, R.string.ext_update_notifications_title, R.string.ext_update_notifications_summary, crumbs, ExtensionsSettingsFragment::class.java)
-			}
-			group(sectionCrumbs, "Catalog") { crumbs ->
-				addItem("sources_catalog", R.string.manage_extensions, R.string.manage_extensions_summary, crumbs, ExtensionsSettingsFragment::class.java)
-				addItem("extension_stores", R.string.extension_stores, R.string.manage_stores_summary, crumbs, ExtensionsSettingsFragment::class.java)
-				addItem("migrate_broken_sources", R.string.migrate_broken_sources, R.string.migrate_broken_sources_summary, crumbs, ExtensionsSettingsFragment::class.java)
-				addItem(AppSettings.KEY_PRIVATE_INSTALLER, R.string.private_extensions, R.string.private_extensions_summary, crumbs, ExtensionsSettingsFragment::class.java)
-			}
-			group(sectionCrumbs, ctx.getString(R.string.appearance)) { crumbs ->
-				addItem(AppSettings.KEY_SOURCES_ORDER, R.string.sort_order, breadcrumbs = crumbs, fragmentClass = ExtensionsSettingsFragment::class.java)
-				addItem(AppSettings.KEY_SOURCES_GRID, R.string.show_in_grid_view, breadcrumbs = crumbs, fragmentClass = ExtensionsSettingsFragment::class.java)
-			}
-			group(sectionCrumbs, ctx.getString(R.string.filter)) { crumbs ->
-				addItem(AppSettings.KEY_DEFAULT_BROWSE_SORT, R.string.extensions_default_sort, R.string.extensions_default_sort_summary, crumbs, ExtensionsSettingsFragment::class.java)
-				addItem(AppSettings.KEY_CONTENT_FILTER, R.string.show_extensions, breadcrumbs = crumbs, fragmentClass = ExtensionsSettingsFragment::class.java, keywordRes = intArrayOf(R.string.nsfw_filter, R.string.disable_nsfw, R.string.sfw, R.string.content_warning_mixed, R.string.nsfw))
-				addItem(AppSettings.KEY_INCOGNITO_NSFW, R.string.incognito_for_nsfw, breadcrumbs = crumbs, fragmentClass = ExtensionsSettingsFragment::class.java, keywordArrayRes = intArrayOf(R.array.incognito_nsfw_options))
-			}
-		}
-
 		section(R.string.reader_settings, ReaderSettingsFragment::class.java) { sectionCrumbs ->
 			group(sectionCrumbs, "Mode") { crumbs ->
 				addItem(AppSettings.KEY_READER_MODE, R.string.default_mode, breadcrumbs = crumbs, fragmentClass = ReaderSettingsFragment::class.java, keywordArrayRes = intArrayOf(R.array.reader_modes))
@@ -191,54 +166,6 @@ class SettingsSearchHelper @Inject constructor(
 			}
 		}
 
-		section(R.string.storage_and_network, StorageAndNetworkSettingsFragment::class.java) { sectionCrumbs ->
-			group(sectionCrumbs, ctx.getString(R.string.storage_usage)) { crumbs ->
-				addItem("data_removal", R.string.data_removal, breadcrumbs = crumbs, fragmentClass = DataCleanupSettingsFragment::class.java)
-				addItem(AppSettings.KEY_SEARCH_HISTORY_CLEAR, R.string.clear_search_history, breadcrumbs = crumbs + ctx.getString(R.string.data_removal), fragmentClass = DataCleanupSettingsFragment::class.java)
-				addItem(AppSettings.KEY_UPDATES_FEED_CLEAR, R.string.clear_updates_feed, breadcrumbs = crumbs + ctx.getString(R.string.data_removal), fragmentClass = DataCleanupSettingsFragment::class.java)
-				addItem(AppSettings.KEY_THUMBS_CACHE_CLEAR, R.string.clear_thumbs_cache, breadcrumbs = crumbs + ctx.getString(R.string.data_removal), fragmentClass = DataCleanupSettingsFragment::class.java)
-				addItem(AppSettings.KEY_PAGES_CACHE_CLEAR, R.string.clear_pages_cache, breadcrumbs = crumbs + ctx.getString(R.string.data_removal), fragmentClass = DataCleanupSettingsFragment::class.java)
-				addItem(AppSettings.KEY_HTTP_CACHE_CLEAR, R.string.clear_network_cache, breadcrumbs = crumbs + ctx.getString(R.string.data_removal), fragmentClass = DataCleanupSettingsFragment::class.java)
-				addItem(AppSettings.KEY_CLEAR_MANGA_DATA, R.string.clear_database, R.string.clear_database_summary, crumbs + ctx.getString(R.string.data_removal), DataCleanupSettingsFragment::class.java)
-				addItem(AppSettings.KEY_COOKIES_CLEAR, R.string.clear_cookies, R.string.clear_cookies_summary, crumbs + ctx.getString(R.string.data_removal), DataCleanupSettingsFragment::class.java)
-				addItem(AppSettings.KEY_WEBVIEW_CLEAR, R.string.clear_browser_data, R.string.clear_browser_data_summary, crumbs + ctx.getString(R.string.data_removal), DataCleanupSettingsFragment::class.java)
-				addItem(AppSettings.KEY_CHAPTERS_CLEAR, R.string.delete_read_chapters, R.string.delete_read_chapters_summary, crumbs + ctx.getString(R.string.data_removal), DataCleanupSettingsFragment::class.java)
-				addItem(AppSettings.KEY_CHAPTERS_CLEAR_AUTO, R.string.delete_read_chapters_auto, R.string.delete_read_chapters_auto_summary, crumbs + ctx.getString(R.string.data_removal), DataCleanupSettingsFragment::class.java)
-				addItem(AppSettings.KEY_CHAPTERS_CLEAR_KEEP, R.string.delete_read_chapters_keep, R.string.delete_read_chapters_keep_immediate, crumbs + ctx.getString(R.string.data_removal), DataCleanupSettingsFragment::class.java)
-			}
-			group(sectionCrumbs, "Network") { crumbs ->
-				addItem(AppSettings.KEY_PREFETCH_CONTENT, R.string.prefetch_content, breadcrumbs = crumbs, fragmentClass = StorageAndNetworkSettingsFragment::class.java, keywordArrayRes = intArrayOf(R.array.network_policy))
-				addItem("proxy", R.string.proxy, breadcrumbs = crumbs, fragmentClass = ProxySettingsFragment::class.java)
-				addItem(AppSettings.KEY_PROXY_TYPE, R.string.type, breadcrumbs = crumbs + ctx.getString(R.string.proxy), fragmentClass = ProxySettingsFragment::class.java, keywordArrayRes = intArrayOf(R.array.proxy_types))
-				addItem(AppSettings.KEY_PROXY_ADDRESS, R.string.address, breadcrumbs = crumbs + ctx.getString(R.string.proxy), fragmentClass = ProxySettingsFragment::class.java)
-				addItem(AppSettings.KEY_PROXY_PORT, R.string.port, breadcrumbs = crumbs + ctx.getString(R.string.proxy), fragmentClass = ProxySettingsFragment::class.java)
-				addItem(AppSettings.KEY_PROXY_LOGIN, R.string.username, breadcrumbs = crumbs + ctx.getString(R.string.proxy), fragmentClass = ProxySettingsFragment::class.java)
-				addItem(AppSettings.KEY_PROXY_PASSWORD, R.string.password, breadcrumbs = crumbs + ctx.getString(R.string.proxy), fragmentClass = ProxySettingsFragment::class.java)
-				addItem("proxy_test_connection", R.string.test_connection, breadcrumbs = crumbs + ctx.getString(R.string.proxy), fragmentClass = ProxySettingsFragment::class.java)
-				addItem(AppSettings.KEY_DOH, R.string.dns_over_https, breadcrumbs = crumbs, fragmentClass = StorageAndNetworkSettingsFragment::class.java, keywordArrayRes = intArrayOf(R.array.doh_providers))
-				addItem(AppSettings.KEY_MIHON_USER_AGENT, R.string.user_agent, breadcrumbs = crumbs, fragmentClass = StorageAndNetworkSettingsFragment::class.java, keywordText = listOf("webview", "browser", "mihon"))
-				addItem(AppSettings.KEY_IMAGES_PROXY, R.string.images_proxy_title, breadcrumbs = crumbs, fragmentClass = StorageAndNetworkSettingsFragment::class.java, keywordArrayRes = intArrayOf(R.array.image_proxies))
-				addItem(AppSettings.KEY_SSL_BYPASS, R.string.ignore_ssl_errors, R.string.ignore_ssl_errors_summary, crumbs, StorageAndNetworkSettingsFragment::class.java)
-				addItem(AppSettings.KEY_OFFLINE_DISABLED, R.string.disable_connectivity_check, R.string.disable_connectivity_check_summary, crumbs, StorageAndNetworkSettingsFragment::class.java)
-				addItem(AppSettings.KEY_ADBLOCK, R.string.adblock, R.string.adblock_summary, crumbs, StorageAndNetworkSettingsFragment::class.java)
-			}
-		}
-
-		section(R.string.downloads, DownloadsSettingsFragment::class.java) { sectionCrumbs ->
-			group(sectionCrumbs, "General") { crumbs ->
-				addItem(AppSettings.KEY_LOCAL_MANGA_DIRS, R.string.local_manga_directories, breadcrumbs = crumbs, fragmentClass = DownloadsSettingsFragment::class.java)
-				addItem(AppSettings.KEY_LOCAL_STORAGE, R.string.manga_save_location, breadcrumbs = crumbs, fragmentClass = DownloadsSettingsFragment::class.java)
-				addItem(AppSettings.KEY_DOWNLOADS_FORMAT, R.string.preferred_download_format, breadcrumbs = crumbs, fragmentClass = DownloadsSettingsFragment::class.java, keywordArrayRes = intArrayOf(R.array.download_formats))
-				addItem(AppSettings.KEY_DOWNLOADS_METERED_NETWORK, R.string.download_over_cellular, breadcrumbs = crumbs, fragmentClass = DownloadsSettingsFragment::class.java, keywordArrayRes = intArrayOf(R.array.metered_network_options))
-				addItem("rebuild_downloads_index", R.string.rebuild_downloads_index, R.string.rebuild_downloads_index_summary, crumbs, DownloadsSettingsFragment::class.java)
-				addItem("ignore_dose", R.string.disable_battery_optimization, R.string.disable_battery_optimization_summary_downloads, crumbs, DownloadsSettingsFragment::class.java)
-			}
-			group(sectionCrumbs, ctx.getString(R.string.pages_saving)) { crumbs ->
-				addItem(AppSettings.KEY_PAGES_SAVE_DIR, R.string.default_page_save_dir, breadcrumbs = crumbs, fragmentClass = DownloadsSettingsFragment::class.java)
-				addItem(AppSettings.KEY_PAGES_SAVE_ASK, R.string.ask_for_dest_dir_every_time, breadcrumbs = crumbs, fragmentClass = DownloadsSettingsFragment::class.java)
-			}
-		}
-
 		section(R.string.backup_restore, BackupSettingsFragment::class.java) { sectionCrumbs ->
 			group(sectionCrumbs, ctx.getString(R.string.backup_restore)) { crumbs ->
 				addItem("create_backup", R.string.create_backup, R.string.create_backup_summary, crumbs, BackupSettingsFragment::class.java)
@@ -255,76 +182,6 @@ class SettingsSearchHelper @Inject constructor(
 				addItem("restore_backup", R.string.restore_from_tachiyomi, R.string.restore_tachiyomi_summary, crumbs, BackupSettingsFragment::class.java)
 				addItem("migrate_from_kotatsu", R.string.migrate_from_kotatsu, breadcrumbs = crumbs, fragmentClass = BackupSettingsFragment::class.java, keywordText = listOf("kotatsu"))
 				addItem("export_to_mihon", R.string.export_to_mihon, R.string.export_to_mihon_summary, crumbs, BackupSettingsFragment::class.java, keywordText = listOf("mihon", "tachiyomi", "tachibk", "export"))
-			}
-		}
-
-		section(R.string.check_for_new_chapters, TrackerSettingsFragment::class.java) { sectionCrumbs ->
-			group(sectionCrumbs, "Tracker") { crumbs ->
-				addItem(AppSettings.KEY_TRACKER_ENABLED, R.string.check_new_chapters_title, breadcrumbs = crumbs, fragmentClass = TrackerSettingsFragment::class.java)
-				addItem(AppSettings.KEY_TRACKER_WIFI_ONLY, R.string.only_using_wifi, R.string.tracker_wifi_only_summary, crumbs, TrackerSettingsFragment::class.java)
-				addItem(AppSettings.KEY_TRACKER_FREQUENCY, R.string.frequency_of_check, breadcrumbs = crumbs, fragmentClass = TrackerSettingsFragment::class.java, keywordArrayRes = intArrayOf(R.array.tracker_frequency))
-				addItem(AppSettings.KEY_TRACK_SOURCES, R.string.track_sources, breadcrumbs = crumbs, fragmentClass = TrackerSettingsFragment::class.java, keywordArrayRes = intArrayOf(R.array.track_sources))
-				addItem("track_categories", R.string.favourites_categories, breadcrumbs = crumbs, fragmentClass = TrackerSettingsFragment::class.java)
-				addItem("notifications_settings", R.string.notifications_settings, breadcrumbs = crumbs, fragmentClass = TrackerSettingsFragment::class.java)
-				addItem(AppSettings.KEY_FEED_SWIPE_GESTURES, R.string.feed_swipe_gestures, R.string.feed_swipe_gestures_summary, crumbs, TrackerSettingsFragment::class.java)
-				addItem(AppSettings.KEY_TRACKER_NO_NSFW, R.string.disable_nsfw_notifications, R.string.disable_nsfw_notifications_summary, crumbs, TrackerSettingsFragment::class.java)
-				addItem(AppSettings.KEY_TRACKER_FAILURE_NOTIFICATION, R.string.failed_checks_notification, R.string.failed_checks_notification_summary, crumbs, TrackerSettingsFragment::class.java)
-				addItem(AppSettings.KEY_TRACKER_DOWNLOAD, R.string.download_new_chapters, breadcrumbs = crumbs, fragmentClass = TrackerSettingsFragment::class.java)
-				addItem(AppSettings.KEY_FEED_COUNTER_DOT, R.string.feed_counter_dot, R.string.feed_counter_dot_summary, crumbs, TrackerSettingsFragment::class.java)
-				addItem(AppSettings.KEY_TRACKER_SMART_UPDATE, R.string.smart_update, R.string.smart_update_summary, crumbs, TrackerSettingsFragment::class.java)
-			}
-			group(sectionCrumbs, ctx.getString(R.string.debug)) { crumbs ->
-				addItem("tracker_debug", R.string.tracker_debug_info, R.string.tracker_debug_info_summary, crumbs, TrackerSettingsFragment::class.java)
-				addItem("ignore_dose", R.string.disable_battery_optimization, R.string.disable_battery_optimization_summary, crumbs, TrackerSettingsFragment::class.java)
-				addItem("track_warning", R.string.tracker_warning, breadcrumbs = crumbs, fragmentClass = TrackerSettingsFragment::class.java)
-			}
-		}
-
-		section(R.string.services, ServicesSettingsFragment::class.java) { sectionCrumbs ->
-			group(sectionCrumbs, "General") { crumbs ->
-				addItem("suggestions_screen", R.string.suggestions, breadcrumbs = crumbs, fragmentClass = SuggestionsSettingsFragment::class.java)
-				addItem(AppSettings.KEY_SUGGESTIONS, R.string.suggestions_enable, breadcrumbs = crumbs + ctx.getString(R.string.suggestions), fragmentClass = SuggestionsSettingsFragment::class.java)
-				addItem(AppSettings.KEY_SUGGESTIONS_WIFI_ONLY, R.string.only_using_wifi, R.string.suggestions_wifi_only_summary, crumbs + ctx.getString(R.string.suggestions), SuggestionsSettingsFragment::class.java)
-				addItem(AppSettings.KEY_SUGGESTIONS_NOTIFICATIONS, R.string.notifications_enable, R.string.suggestions_notifications_summary, crumbs + ctx.getString(R.string.suggestions), SuggestionsSettingsFragment::class.java)
-				addItem(AppSettings.KEY_SUGGESTIONS_EXCLUDE_TAGS, R.string.suggestions_excluded_genres, R.string.suggestions_excluded_genres_summary, crumbs + ctx.getString(R.string.suggestions), SuggestionsSettingsFragment::class.java)
-				addItem(AppSettings.KEY_SUGGESTIONS_EXCLUDE_NSFW, R.string.exclude_nsfw_from_suggestions, R.string.exclude_nsfw_from_suggestions_summary, crumbs + ctx.getString(R.string.suggestions), SuggestionsSettingsFragment::class.java)
-				addItem(AppSettings.KEY_SUGGESTIONS_EXCLUDE_NOVELS, R.string.exclude_novels_from_suggestions, R.string.exclude_novels_from_suggestions_summary, crumbs + ctx.getString(R.string.suggestions), SuggestionsSettingsFragment::class.java)
-				addItem(AppSettings.KEY_RELATED_MANGA, R.string.related_manga, R.string.related_manga_summary, crumbs, ServicesSettingsFragment::class.java)
-				addItem(AppSettings.KEY_STATS_ENABLED, R.string.reading_stats, breadcrumbs = crumbs, fragmentClass = ServicesSettingsFragment::class.java)
-				addItem(AppSettings.KEY_READING_TIME, R.string.reading_time_estimation, R.string.reading_time_estimation_summary, crumbs, ServicesSettingsFragment::class.java)
-				addItem(AppSettings.KEY_EYE_REMINDER, R.string.eye_reminder, breadcrumbs = crumbs, fragmentClass = ServicesSettingsFragment::class.java)
-			}
-			group(sectionCrumbs, ctx.getString(R.string.tracking)) { crumbs ->
-				addItem(AppSettings.KEY_SCROBBLING_PROGRESS_SYNC, R.string.sync_progress_from_tracking, R.string.sync_progress_from_tracking_summary, crumbs, ServicesSettingsFragment::class.java)
-				addItem("anilist", R.string.anilist, breadcrumbs = crumbs, fragmentClass = ServicesSettingsFragment::class.java)
-				addItem("kitsu", R.string.kitsu, breadcrumbs = crumbs, fragmentClass = ServicesSettingsFragment::class.java)
-				addItem("mal", R.string.mal, breadcrumbs = crumbs, fragmentClass = ServicesSettingsFragment::class.java)
-				addItem("shikimori", R.string.shikimori, breadcrumbs = crumbs, fragmentClass = ServicesSettingsFragment::class.java)
-			}
-			group(sectionCrumbs, "External") { crumbs ->
-				addItem("discord_rpc", R.string.discord_rpc, R.string.discord_rpc_summary, crumbs, DiscordSettingsFragment::class.java)
-				addItem("discord_token", R.string.discord_token, breadcrumbs = crumbs + ctx.getString(R.string.discord), fragmentClass = DiscordSettingsFragment::class.java, keywordText = listOf("token", "sign in", "browser"))
-				addItem("discord_skip_nsfw", R.string.disable_nsfw, R.string.rpc_skip_nsfw_summary, crumbs + ctx.getString(R.string.discord), DiscordSettingsFragment::class.java)
-			}
-		}
-
-		section(R.string.about, AboutSettingsFragment::class.java) { sectionCrumbs ->
-			group(sectionCrumbs, "Updates") { crumbs ->
-				addItem("app_version", R.string.check_for_updates, breadcrumbs = crumbs, fragmentClass = AboutSettingsFragment::class.java)
-				addItem("changelog", R.string.changelog, R.string.changelog_summary, crumbs, AboutSettingsFragment::class.java)
-			}
-			group(sectionCrumbs, "Links") { crumbs ->
-				addItem("about_help", R.string.user_manual, R.string.url_user_manual, crumbs, AboutSettingsFragment::class.java)
-				addItem("about_github", R.string.source_code, R.string.url_github, crumbs, AboutSettingsFragment::class.java)
-				addItem("about_discord", R.string.discord, R.string.url_discord_web, crumbs, AboutSettingsFragment::class.java)
-			}
-			group(sectionCrumbs, "Diagnostics") { crumbs ->
-				addItem(
-					"developer_testing_tools",
-					R.string.developer_testing_tools,
-					breadcrumbs = crumbs,
-					fragmentClass = AboutSettingsFragment::class.java,
-				)
 			}
 		}
 

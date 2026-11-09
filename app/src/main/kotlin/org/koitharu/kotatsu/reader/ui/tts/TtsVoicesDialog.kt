@@ -196,15 +196,3 @@ private fun Voice.label(context: Context): String = buildList {
 	}
 	if (isNetworkConnectionRequired) add(context.getString(R.string.tts_voice_needs_internet))
 }.joinToString(" · ")
-
-private fun Context.openVoiceDownloads(intent: Intent) {
-	try {
-		startActivity(intent)
-	} catch (_: ActivityNotFoundException) {
-		// Engines without a download screen: Android's own text-to-speech settings at least.
-		try {
-			startActivity(Intent("com.android.settings.TTS_SETTINGS"))
-		} catch (_: ActivityNotFoundException) {
-		}
-	}
-}
