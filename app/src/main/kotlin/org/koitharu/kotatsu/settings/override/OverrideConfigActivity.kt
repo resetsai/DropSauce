@@ -17,7 +17,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.core.text.parseAsHtml
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePaddingRelative
@@ -27,10 +26,8 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import org.koitharu.kotatsu.R
 import org.koitharu.kotatsu.core.ui.BaseActivity
-import org.koitharu.kotatsu.core.ui.dialog.showTextInputDialog
 import org.koitharu.kotatsu.core.util.ext.end
 import org.koitharu.kotatsu.core.util.ext.getDisplayMessage
-import org.koitharu.kotatsu.core.util.ext.isHttpUrl
 import org.koitharu.kotatsu.core.util.ext.observe
 import org.koitharu.kotatsu.core.util.ext.observeEvent
 import org.koitharu.kotatsu.core.util.ext.start
@@ -143,10 +140,8 @@ class OverrideConfigActivity : BaseActivity<ActivityOverrideEditBinding>(), Acti
 	}
 
 	override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-		// Greyed out while there is nothing to import from — but still tappable, so a tap can say
-		// why instead of doing nothing. A disabled item would keep its full-strength icon anyway.
 		val hasTrackers = viewModel.trackers.value.isNotEmpty()
-		menu.findItem(R.id.action_import)?.icon?.alpha = if (hasTrackers) 255 else 97
+		menu.findItem(R.id.action_import)?.isVisible = hasTrackers
 		return super.onPrepareOptionsMenu(menu)
 	}
 
@@ -229,7 +224,6 @@ class OverrideConfigActivity : BaseActivity<ActivityOverrideEditBinding>(), Acti
 
 			CoverSource.PAGE -> pickPageLauncher.launch(viewModel.data.value?.first)
 
-			CoverSource.URL -> showCoverUrlDialog()
 		}
 	}
 
@@ -237,22 +231,4 @@ class OverrideConfigActivity : BaseActivity<ActivityOverrideEditBinding>(), Acti
 		Snackbar.make(viewBinding.composeView, R.string.operation_not_supported, Snackbar.LENGTH_SHORT).show()
 	}
 
-	private fun showCoverUrlDialog() {
-		showTextInputDialog(
-			context = this,
-			icon = R.drawable.ic_images,
-			title = getString(R.string.pick_cover_url),
-			initialValue = viewModel.data.value?.second?.coverUrl?.takeIf { it.isHttpUrl() }.orEmpty(),
-			hint = getString(R.string.url),
-			keyboardType = KeyboardType.Uri,
-			isValid = { true },
-		) { text ->
-			val url = text.trim()
-			if (url.isHttpUrl()) {
-				viewModel.updateCover(url)
-			} else {
-				Snackbar.make(viewBinding.composeView, R.string.invalid_url, Snackbar.LENGTH_SHORT).show()
-			}
-		}
-	}
 }

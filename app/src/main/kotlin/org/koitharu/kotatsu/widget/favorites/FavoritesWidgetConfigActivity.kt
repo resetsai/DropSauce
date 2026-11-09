@@ -226,7 +226,7 @@ class FavoritesWidgetConfigActivity : AppCompatActivity() {
 				title.text = manga.title
 				val cachedTitle = sourceTitleOverrides[manga.id]?.takeIf { it.isNotBlank() }
 				subtitle.text = cachedTitle ?: manga.source.getTitle(itemView.context)
-				cover.setImageResource(R.drawable.ic_widget_cover_placeholder)
+				cover.setImageResource(R.drawable.bookplate_offline)
 				val ctx = itemView.context
 				ImageRequest.Builder(ctx)
 					.data(manga.coverUrl)
@@ -238,7 +238,7 @@ class FavoritesWidgetConfigActivity : AppCompatActivity() {
 						},
 						onError = {
 							if (current?.id == manga.id) {
-								cover.setImageResource(R.drawable.ic_widget_cover_placeholder)
+								cover.setImageResource(R.drawable.bookplate_offline)
 							}
 						},
 					)

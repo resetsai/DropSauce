@@ -747,4 +747,14 @@
     <string name="reading_rate">阅读速度</string>
     <string name="minutes_per_chapter_short">%s 分/章</string>
     <string name="eye_reminder">护眼提醒</string>
+    <string name="widget_favorites_config_title">选择要固定的收藏</string>
+    <string name="widget_favorites_pin_counter">已固定 %1$d / %2$d</string>
+    <string name="widget_history_style">小组件样式</string>
+    <string name="widget_history_style_icon">封面网格</string>
+    <string name="widget_history_style_list">列表</string>
+    <string name="widget_cover_content_description">封面</string>
+    <string name="change_info">书籍信息</string>
+    <string name="cover_source_gallery">从相册选择</string>
+    <string name="cover_source_file">从文件选择</string>
+    <string name="cover_source_page">使用书中页面</string>
 </resources>

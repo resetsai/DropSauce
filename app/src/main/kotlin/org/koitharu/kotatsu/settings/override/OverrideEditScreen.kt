@@ -139,14 +139,13 @@ enum class CoverSource(val titleResId: Int, val iconResId: Int) {
 	GALLERY(R.string.cover_source_gallery, R.drawable.ic_images),
 	FILE(R.string.cover_source_file, R.drawable.ic_folder_file),
 	PAGE(R.string.cover_source_page, R.drawable.ic_grid),
-	URL(R.string.cover_source_url, R.drawable.ic_web),
 }
 
 /** Group heading, matching the label above every settings group. */
 @Composable
 private fun SectionLabel(text: String) {
 	Text(
-		text = text.uppercase(),
+		text = text,
 		style = MaterialTheme.typography.labelMedium,
 		fontWeight = FontWeight.SemiBold,
 		color = MaterialTheme.colorScheme.primary,
@@ -154,29 +153,18 @@ private fun SectionLabel(text: String) {
 	)
 }
 
-/** 2x2 block of cover sources; 4dp inner seams make the four tiles read as one card. */
 @Composable
 private fun CoverSourceGrid(enabled: Boolean, onPick: (CoverSource) -> Unit) {
-	val sources = CoverSource.entries
 	Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-		for (row in 0..1) {
-			Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-				for (column in 0..1) {
-					val source = sources[row * 2 + column]
-					CoverSourceTile(
-						source = source,
-						enabled = enabled,
-						shape = RoundedCornerShape(
-							topStart = if (row == 0 && column == 0) 24.dp else 4.dp,
-							topEnd = if (row == 0 && column == 1) 24.dp else 4.dp,
-							bottomStart = if (row == 1 && column == 0) 24.dp else 4.dp,
-							bottomEnd = if (row == 1 && column == 1) 24.dp else 4.dp,
-						),
-						onClick = { onPick(source) },
-						modifier = Modifier.weight(1f),
-					)
-				}
-			}
+		CoverSource.entries.forEachIndexed { index, source ->
+			val top = if (index == 0) 24.dp else 4.dp
+			val bottom = if (index == CoverSource.entries.lastIndex) 24.dp else 4.dp
+			CoverSourceTile(
+				source = source,
+				enabled = enabled,
+				shape = RoundedCornerShape(topStart = top, topEnd = top, bottomStart = bottom, bottomEnd = bottom),
+				onClick = { onPick(source) },
+			)
 		}
 	}
 }
