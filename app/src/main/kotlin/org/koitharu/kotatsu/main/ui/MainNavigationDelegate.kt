@@ -6,7 +6,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.FrameLayout
-import androidx.annotation.AnimatorRes
+import android.view.animation.AnimationUtils
 import androidx.annotation.IdRes
 import androidx.core.view.isEmpty
 import androidx.core.view.isVisible
@@ -239,9 +239,6 @@ class MainNavigationDelegate(
 		val transition = resolveTabTransition(current, itemId)
 		val transaction = fragmentManager.beginTransaction()
 			.setReorderingAllowed(true)
-		if (transition != TabTransition.NONE) {
-			transaction.setCustomAnimations(transition.enterAnimator, transition.exitAnimator)
-		}
 		if (current != null) {
 			transaction.hide(current)
 			transaction.setMaxLifecycle(current, Lifecycle.State.STARTED)
@@ -250,14 +247,6 @@ class MainNavigationDelegate(
 		val shownFragment: Fragment
 		if (existing != null) {
 			shownFragment = existing
-			// Its view still holds the end state of the slide-out it was hidden with.
-			existing.view?.run {
-				alpha = 1f
-				translationX = 0f
-				translationY = 0f
-				scaleX = 1f
-				scaleY = 1f
-			}
 			transaction.show(existing)
 		} else {
 			shownFragment = instantiateFragment(fragmentClass).apply {
@@ -275,6 +264,7 @@ class MainNavigationDelegate(
 			// frame is drawn (and while the fade-in is still near-transparent), so there's no visible jump.
 			shown.resetContentToTop()
 			onFragmentChanged(shown, fromUser = true)
+			animateContent(transition)
 		}
 		transaction.commit()
 		return true
@@ -282,7 +272,7 @@ class MainNavigationDelegate(
 
 	// Content slides along the nav bar's axis, towards where the newly selected item sits.
 	private fun resolveTabTransition(current: Fragment?, @IdRes targetItemId: Int): TabTransition {
-		if (current == null || !navBar.isLaidOut || !navBar.context.isAnimationsEnabled) {
+		if (current == null || !navBar.context.isAnimationsEnabled) {
 			return TabTransition.NONE
 		}
 		val visibleItems = navBar.menu.iterator().asSequence().filter { it.isVisible }.map { it.itemId }.toList()
@@ -441,15 +431,27 @@ class MainNavigationDelegate(
 		}
 	}
 
-	private enum class TabTransition(
-		@AnimatorRes val enterAnimator: Int,
-		@AnimatorRes val exitAnimator: Int,
-	) {
-		NONE(0, 0),
-		LEFT(R.animator.nav_tab_enter_from_right, R.animator.nav_tab_exit_to_left),
-		RIGHT(R.animator.nav_tab_enter_from_left, R.animator.nav_tab_exit_to_right),
-		UP(R.animator.nav_tab_enter_from_bottom, R.animator.nav_tab_exit_to_top),
-		DOWN(R.animator.nav_tab_enter_from_top, R.animator.nav_tab_exit_to_bottom),
+	private enum class TabTransition(val fromX: Int, val fromY: Int) {
+		NONE(0, 0), LEFT(1, 0), RIGHT(-1, 0), UP(0, 1), DOWN(0, -1),
+	}
+
+	private fun animateContent(transition: TabTransition) {
+		val content = navBar.rootView.findViewById<View>(R.id.container) ?: return
+		content.animate().cancel()
+		val distance = content.resources.getDimension(R.dimen.nav_tab_slide_distance)
+		content.translationX = transition.fromX * distance
+		content.translationY = transition.fromY * distance
+		if (transition == TabTransition.NONE) {
+			content.alpha = 1f
+			return
+		}
+		// The same viewport hosts new and previously hidden fragments. Animate it only
+		// after the destination and scroll position are committed, including on rapid reselect.
+		content.alpha = 0.35f
+		content.animate().alpha(1f).translationX(0f).translationY(0f)
+			.setDuration(content.resources.getInteger(R.integer.nav_tab_enter_duration).toLong())
+			.setInterpolator(AnimationUtils.loadInterpolator(content.context, R.interpolator.m3_easing_emphasized_decelerate))
+			.start()
 	}
 
 	fun interface OnFragmentChangedListener {
