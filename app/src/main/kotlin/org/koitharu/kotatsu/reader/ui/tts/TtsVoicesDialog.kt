@@ -1,8 +1,6 @@
 package org.koitharu.kotatsu.reader.ui.tts
 
-import android.content.ActivityNotFoundException
 import android.content.Context
-import android.content.Intent
 import android.speech.tts.Voice
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -39,7 +37,6 @@ import org.koitharu.kotatsu.R
 import org.koitharu.kotatsu.core.ui.dialog.DialogCornerAction
 import org.koitharu.kotatsu.core.ui.dialog.ExpressiveDialogCard
 import org.koitharu.kotatsu.core.ui.dialog.ExpressiveOptionGroupItem
-import org.koitharu.kotatsu.core.ui.dialog.ExpressivePillButton
 import org.koitharu.kotatsu.core.ui.dialog.showComposeDialog
 import org.koitharu.kotatsu.core.util.ext.findActivity
 import java.util.Locale

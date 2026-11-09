@@ -10,16 +10,8 @@ import org.koitharu.kotatsu.core.LocalizedAppContext
 import org.koitharu.kotatsu.core.prefs.AppSettings
 import org.koitharu.kotatsu.settings.AppearanceSettingsFragment
 import org.koitharu.kotatsu.settings.BackupSettingsFragment
-import org.koitharu.kotatsu.settings.DownloadsSettingsFragment
-import org.koitharu.kotatsu.settings.ProxySettingsFragment
 import org.koitharu.kotatsu.settings.ReaderSettingsFragment
-import org.koitharu.kotatsu.settings.ServicesSettingsFragment
-import org.koitharu.kotatsu.settings.StorageAndNetworkSettingsFragment
-import org.koitharu.kotatsu.settings.SuggestionsSettingsFragment
 import org.koitharu.kotatsu.settings.appearance.PreviewSettingsFragment
-import org.koitharu.kotatsu.settings.discord.DiscordSettingsFragment
-import org.koitharu.kotatsu.settings.tracker.TrackerSettingsFragment
-import org.koitharu.kotatsu.settings.userdata.storage.DataCleanupSettingsFragment
 import javax.inject.Inject
 
 @Reusable

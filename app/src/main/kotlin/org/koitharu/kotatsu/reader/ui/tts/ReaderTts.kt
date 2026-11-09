@@ -1,7 +1,6 @@
 package org.koitharu.kotatsu.reader.ui.tts
 
 import android.content.Context
-import android.content.Intent
 import android.media.AudioAttributes
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
@@ -121,10 +120,6 @@ class ReaderTts @Inject constructor(
 		}
 		applySettings()
 	}
-
-	/** Opens the engine's own screen for downloading voices. */
-	fun installVoicesIntent(): Intent = Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA)
-		.setPackage(tts?.defaultEngine)
 
 	/** Some engines throw or hand back null here instead of an empty set; either way there are no voices. */
 	private fun engineVoices(): Set<Voice>? = runCatching { tts?.takeIf { isInitialized }?.voices }.getOrNull()

@@ -6,7 +6,6 @@ import android.widget.TextView
 import androidx.core.net.toUri
 import com.google.android.material.search.SearchView
 import org.koitharu.kotatsu.core.nav.AppRouter
-import org.koitharu.kotatsu.core.parser.MangaLinkResolver
 import org.koitharu.kotatsu.parsers.model.Manga
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.koitharu.kotatsu.parsers.model.MangaTag
@@ -24,14 +23,8 @@ class SearchSuggestionListenerImpl(
 
 	override fun onQueryClick(query: String, kind: SearchKind, submit: Boolean) {
 		if (submit && query.isNotEmpty()) {
-			if (kind == SearchKind.SIMPLE && MangaLinkResolver.isValidLink(query)) {
-				router.openDetails(query.toUri())
-			} else {
-				router.openSearch(query, kind)
-				if (kind != SearchKind.TAG) {
-					viewModel.saveQuery(query)
-				}
-			}
+			router.openSearch(query, kind)
+			if (kind != SearchKind.TAG) viewModel.saveQuery(query)
 			// Deliberately left open: coming back from the results lands on the search bar again.
 		} else {
 			searchView.setText(query)

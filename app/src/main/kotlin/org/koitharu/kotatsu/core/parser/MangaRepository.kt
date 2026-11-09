@@ -1,22 +1,9 @@
 package org.koitharu.kotatsu.core.parser
 
-import android.content.Context
 import androidx.annotation.AnyThread
-import androidx.collection.ArrayMap
-import dagger.hilt.android.qualifiers.ApplicationContext
-import org.koitharu.kotatsu.core.cache.MemoryContentCache
 import org.koitharu.kotatsu.core.model.LocalMangaSource
-import org.koitharu.kotatsu.core.model.MangaSource as ResolveMangaSource
-import org.koitharu.kotatsu.core.model.MissingMangaSource
 import org.koitharu.kotatsu.core.model.MangaSourceInfo
-import org.koitharu.kotatsu.core.model.UnknownMangaSource
 import org.koitharu.kotatsu.local.data.LocalMangaRepository
-import org.koitharu.kotatsu.lnreader.LnPluginManager
-import org.koitharu.kotatsu.lnreader.model.LnMangaSource
-import org.koitharu.kotatsu.mihon.LazyMihonMangaRepository
-import org.koitharu.kotatsu.mihon.MihonExtensionManager
-import org.koitharu.kotatsu.mihon.MihonMangaRepository
-import org.koitharu.kotatsu.mihon.model.MihonMangaSource
 import org.koitharu.kotatsu.parsers.model.Manga
 import org.koitharu.kotatsu.parsers.model.MangaChapter
 import org.koitharu.kotatsu.parsers.model.MangaListFilter
@@ -27,7 +14,6 @@ import okhttp3.Response
 import org.koitharu.kotatsu.parsers.model.MangaPage
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.koitharu.kotatsu.parsers.model.SortOrder
-import java.lang.ref.WeakReference
 import javax.inject.Inject
 import javax.inject.Singleton
 

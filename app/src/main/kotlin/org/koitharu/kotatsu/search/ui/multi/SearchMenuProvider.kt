@@ -29,20 +29,6 @@ class SearchMenuProvider(
 			activity.findViewById<View>(R.id.action_search_kind)?.let(::showFilterPopup)
 			return true
 		}
-		when (menuItem.itemId) {
-			R.id.action_filter_pinned_only -> {
-				menuItem.isChecked = !menuItem.isChecked
-				viewModel.setPinnedOnly(menuItem.isChecked)
-				return true
-			}
-
-			R.id.action_filter_local_only -> {
-				menuItem.isChecked = !menuItem.isChecked
-				viewModel.setLocalOnly(menuItem.isChecked)
-				return true
-			}
-		}
-
 		val newKind = when (menuItem.itemId) {
 			R.id.action_kind_simple -> SearchKind.SIMPLE
 			R.id.action_kind_title -> SearchKind.TITLE
@@ -73,12 +59,8 @@ class SearchMenuProvider(
 				SearchKind.TAG -> R.id.action_kind_tag
 			},
 		)?.isChecked = true
-		menu.findItem(R.id.action_filter_pinned_only)?.run {
-			isChecked = viewModel.isPinnedOnly
-			// Pinned sources are not searched at all in local-only mode.
-			isEnabled = !viewModel.isLocalOnly
-		}
-		menu.findItem(R.id.action_filter_local_only)?.isChecked = viewModel.isLocalOnly
+		menu.removeItem(R.id.action_filter_pinned_only)
+		menu.removeItem(R.id.action_filter_local_only)
 		popup.setOnMenuItemClickListener(::onMenuItemSelected)
 		popup.show()
 	}

@@ -20,7 +20,6 @@ import android.text.Layout
 import android.text.NoCopySpan
 import android.text.Spannable
 import android.text.SpannableString
-import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.SpannedString
 import android.text.StaticLayout
@@ -78,7 +77,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import coil3.ImageLoader
 import coil3.request.ImageRequest
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -86,14 +84,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import okhttp3.HttpUrl.Companion.toHttpUrl
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import org.jsoup.Jsoup
 import org.koitharu.kotatsu.R
 import org.koitharu.kotatsu.bookmarks.domain.Bookmark
@@ -105,7 +100,6 @@ import org.koitharu.kotatsu.core.exceptions.resolve.ExceptionResolver
 import org.koitharu.kotatsu.core.model.isNovelSource
 import org.koitharu.kotatsu.core.model.unwrap
 import org.koitharu.kotatsu.core.nav.router
-import org.koitharu.kotatsu.core.network.BaseHttpClient
 import org.koitharu.kotatsu.core.parser.MangaRepository
 import org.koitharu.kotatsu.lnreader.model.LnMangaSource
 import org.koitharu.kotatsu.mihon.model.MihonMangaSource
@@ -130,7 +124,6 @@ import org.koitharu.kotatsu.core.util.ext.isZipUri
 import org.koitharu.kotatsu.local.data.input.EpubParser
 import org.koitharu.kotatsu.databinding.FragmentReaderEpubBinding
 import org.koitharu.kotatsu.databinding.ItemErrorStateBinding
-import org.koitharu.kotatsu.databinding.SheetEpubDictionaryBinding
 import org.koitharu.kotatsu.parsers.model.Manga
 import org.koitharu.kotatsu.parsers.model.MangaChapter
 import org.koitharu.kotatsu.parsers.util.ifZero
@@ -1163,7 +1156,6 @@ class EpubReaderFragment : BaseReaderFragment<FragmentReaderEpubBinding>() {
 		private fun updateSelectionActions(menu: Menu): Boolean {
 			val selection = selectedText(textView)
 			val highlight = selection?.let(::selectedHighlight)
-			menu.findItem(ACTION_DICTIONARY)?.isVisible = selection?.text?.matches(WORD_PATTERN) == true
 			menu.findItem(ACTION_HIGHLIGHT)?.isVisible = selection != null && highlight == null
 			menu.findItem(ACTION_REMOVE_HIGHLIGHT)?.isVisible = highlight != null
 			return true
@@ -2083,12 +2075,10 @@ class EpubReaderFragment : BaseReaderFragment<FragmentReaderEpubBinding>() {
 		private const val PUBLISHER_HORIZONTAL_PADDING_DP = 20
 		private const val MAX_BOTTOM_MARGIN_DP = 96
 		private const val MAX_IMAGE_HEIGHT_FRACTION = 0.75f
-		private const val ACTION_DICTIONARY = 0x455001
 		private const val ACTION_HIGHLIGHT = 0x455002
 		private const val ACTION_REMOVE_HIGHLIGHT = 0x455003
 		private const val HIGHLIGHT_ALPHA = 0x66
 		private const val DEFAULT_HIGHLIGHT_COLOR = 0x66FFD54F
-		private const val DICTIONARY_URL = "https://api.dictionaryapi.dev/api/v2/entries/en"
 		private const val MAX_MEANINGS = 4
 		private const val MAX_DEFINITIONS_PER_MEANING = 3
 		private const val MAX_SYNONYMS = 8
@@ -2102,7 +2092,6 @@ class EpubReaderFragment : BaseReaderFragment<FragmentReaderEpubBinding>() {
 				"\u1100-\u11FF\uAC00-\uD7AF\u0E00-\u0EFF\u1780-\u17FF]",
 		)
 
-		private val WORD_PATTERN = Regex("[\\p{L}\\p{M}]+(?:['’\\-][\\p{L}\\p{M}]+)*")
 		private val EMPTY_CHAPTER_TEXT = SpannedString("\u2014")
 	}
 }

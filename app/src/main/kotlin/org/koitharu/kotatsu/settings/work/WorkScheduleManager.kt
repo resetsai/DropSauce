@@ -8,10 +8,6 @@ import kotlinx.coroutines.launch
 import org.koitharu.kotatsu.backup.local.ui.periodical.PeriodicalBackupWorker
 import org.koitharu.kotatsu.core.prefs.AppSettings
 import org.koitharu.kotatsu.core.util.ext.processLifecycleScope
-import org.koitharu.kotatsu.lnreader.LnPluginManager
-import org.koitharu.kotatsu.suggestions.ui.SuggestionsWorker
-import org.koitharu.kotatsu.sync.data.SyncSettings
-import org.koitharu.kotatsu.tracker.work.TrackWorker
 import javax.inject.Inject
 import javax.inject.Singleton
 

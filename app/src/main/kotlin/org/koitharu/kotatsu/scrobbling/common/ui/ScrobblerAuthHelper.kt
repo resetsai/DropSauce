@@ -1,8 +1,6 @@
 package org.koitharu.kotatsu.scrobbling.common.ui
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import androidx.core.net.toUri
 import org.koitharu.kotatsu.scrobbling.common.domain.ScrobblerRepositoryMap
 import org.koitharu.kotatsu.scrobbling.common.domain.model.ScrobblerService

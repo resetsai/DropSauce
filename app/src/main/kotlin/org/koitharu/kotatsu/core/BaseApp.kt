@@ -3,8 +3,6 @@ package org.koitharu.kotatsu.core
 import android.app.Activity
 import android.app.Application
 import android.content.Context
-import android.content.ComponentName
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Environment
 import androidx.annotation.WorkerThread

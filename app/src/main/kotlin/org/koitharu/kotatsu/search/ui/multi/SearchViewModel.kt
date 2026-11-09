@@ -5,7 +5,6 @@ import androidx.collection.LongSet
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
@@ -17,7 +16,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
-import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import org.koitharu.kotatsu.R
 import org.koitharu.kotatsu.core.model.LocalMangaSource
@@ -38,7 +36,6 @@ import org.koitharu.kotatsu.list.ui.model.ListModel
 import org.koitharu.kotatsu.list.ui.model.LoadingFooter
 import org.koitharu.kotatsu.list.ui.model.LoadingState
 import org.koitharu.kotatsu.parsers.model.Manga
-import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.koitharu.kotatsu.parsers.util.runCatchingCancellable
 import org.koitharu.kotatsu.search.domain.SearchKind
 import org.koitharu.kotatsu.search.domain.SearchV2Helper
@@ -60,7 +57,7 @@ class SearchViewModel @Inject constructor(
 	val query = savedStateHandle.get<String>(AppRouter.KEY_QUERY).orEmpty()
 	val kind = savedStateHandle.get<SearchKind>(AppRouter.KEY_KIND) ?: SearchKind.SIMPLE
 	/** Manga vs novel sources. Picked from the chip row on this screen and remembered for next time. */
-	val novelScope = MutableStateFlow(settings.isGlobalSearchNovelScope)
+	val novelScope = MutableStateFlow(false)
 	private val isNovelScope: Boolean
 		get() = novelScope.value
 
@@ -167,31 +164,9 @@ class SearchViewModel @Inject constructor(
 		searchJob = launchLoadingJob(Dispatchers.Default) {
 			prevJob?.cancelAndJoin()
 			try {
-				// Source requests start right away instead of after the local phase (a full storage
-				// scan with many downloads); their results still land below the local sections.
-				val localDone = CompletableDeferred<Unit>()
-				val remoteJobs = if (localOnly.value) {
-					emptyList()
-				} else {
-					val sources = if (pinnedOnly.value) {
-						sourcesRepository.getPinnedSources().toList()
-					} else {
-						sourcesRepository.getEnabledSources()
-					}.filter { it.isNovelSource == isNovelScope }
-					val semaphore = Semaphore(MAX_PARALLELISM)
-					sources.map { source ->
-						launch {
-							val result = semaphore.withPermit { searchSource(source) }
-							localDone.await()
-							appendResult(result)
-						}
-					}
-				}
 				appendResult(searchFavorites())
 				appendResult(searchHistory())
 				appendResult(searchLocal())
-				localDone.complete(Unit)
-				remoteJobs.joinAll()
 			} finally {
 				if (generation == searchGeneration) {
 					isSearching.value = false
@@ -201,34 +176,6 @@ class SearchViewModel @Inject constructor(
 	}
 
 	// impl
-
-	private suspend fun searchSource(source: MangaSource): SearchResultsListModel? = runCatchingCancellable {
-		val searchHelper = searchHelperFactory.create(source)
-		searchHelper(query, kind)
-	}.fold(
-		onSuccess = { result ->
-			if (result == null || result.manga.isEmpty()) {
-				null
-			} else {
-				val list = mangaListMapper.toListModelList(
-					manga = result.manga,
-					mode = ListMode.GRID,
-				)
-				SearchResultsListModel(
-					titleResId = 0,
-					source = source,
-					list = list,
-					error = null,
-					listFilter = result.listFilter,
-					sortOrder = result.sortOrder,
-				)
-			}
-		},
-		onFailure = { error ->
-			error.printStackTraceDebug()
-			SearchResultsListModel(0, source, null, null, emptyList(), error)
-		},
-	)
 
 	private suspend fun searchHistory(): SearchResultsListModel? = runCatchingCancellable {
 		historyRepository.search(query, kind, Int.MAX_VALUE)
@@ -294,9 +241,7 @@ class SearchViewModel @Inject constructor(
 		},
 	)
 
-	private suspend fun searchLocal(): SearchResultsListModel? = if (isNovelScope) {
-		null
-	} else runCatchingCancellable {
+	private suspend fun searchLocal(): SearchResultsListModel? = runCatchingCancellable {
 		searchHelperFactory.create(LocalMangaSource).invoke(query, kind)
 	}.fold(
 		onSuccess = { result ->

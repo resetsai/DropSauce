@@ -4,7 +4,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onEach
@@ -20,7 +19,6 @@ import org.koitharu.kotatsu.core.util.ext.call
 import org.koitharu.kotatsu.history.data.HistoryRepository
 import org.koitharu.kotatsu.main.domain.ReadingResumeEnabledUseCase
 import org.koitharu.kotatsu.parsers.model.Manga
-import org.koitharu.kotatsu.settings.sources.catalog.ExtensionStoreManager
 import org.koitharu.kotatsu.tracker.domain.TrackingRepository
 import javax.inject.Inject
 
