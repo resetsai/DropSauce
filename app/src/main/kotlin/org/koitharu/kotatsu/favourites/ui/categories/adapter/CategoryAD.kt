@@ -53,8 +53,6 @@ fun categoryAD(
 				item.mangaCount,
 			)
 		}
-		binding.imageViewTracker.isVisible = item.category.isTrackingEnabled
-		binding.imageViewDownload.isVisible = item.category.isNewChaptersDownloadEnabled
 		binding.imageViewHidden.isGone = item.category.isVisibleInLibrary
 		binding.coversView.setCoversAsync(item.covers)
 	}

@@ -719,4 +719,26 @@
     <string name="offline_delete_read_chapters">已读章节将从设备中永久删除。若要恢复导入的内容，你需要保留原文件。</string>
     <string name="offline_history_hint">打开书库中的书开始阅读，这里就会留下阅读记录。</string>
     <string name="status">状态</string>
+    <string name="directory_storage_summary">此目录占用 %1$s · 可用 %2$s</string>
+    <string name="no_recorded_updates">暂无章节更新记录</string>
+    <string name="category_order">调整分类顺序</string>
+    <string name="category_shelf_summary">在书架中显示此分类</string>
+    <string name="epub_reading_tab">阅读</string>
+    <string name="total_read_time">总阅读时长</string>
+    <string name="stats_top_manga">阅读排行</string>
+    <string name="stats_chapters_read">已读章节</string>
+    <string name="stats_pages_read">已读页数</string>
+    <string name="stats_day_streak">连续阅读天数</string>
+    <string name="stats_longest_streak">最长 %d 天</string>
+    <string name="stats_daily_average">日均</string>
+    <string name="stats_active_days">阅读 %d 天</string>
+    <string name="stats_active_days_short">阅读天数</string>
+    <string name="stats_categories_all">所有分类</string>
+    <string name="stats_since">始于 %s</string>
+    <string name="stats_range_day">最近 24 小时</string>
+    <string name="stats_range_week">最近 7 天</string>
+    <string name="stats_range_month">最近 30 天</string>
+    <string name="stats_range_3months">最近 13 周</string>
+    <string name="stats_range_year">最近 12 个月</string>
+    <string name="stats_range_all">所有时间</string>
 </resources>

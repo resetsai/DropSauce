@@ -56,10 +56,9 @@ fun directoryConfigAD(
                 append(getString(R.string.private_app_directory_warning))
             }
         }
-        binding.indicatorSize.max = FileSize.BYTES.convert(item.available, FileSize.KILOBYTES).toInt()
-        binding.indicatorSize.progress = FileSize.BYTES.convert(item.size, FileSize.KILOBYTES).toInt()
         binding.textViewSize.text = context.getString(
-            R.string.available_pattern,
+            R.string.directory_storage_summary,
+            FileSize.BYTES.format(context, item.size),
             FileSize.BYTES.format(context, item.available),
         )
     }

@@ -773,4 +773,12 @@
 		<item name="cornerSize">12dp</item>
 	</style>
 
+	<style name="Widget.Kotatsu.GestureCell" parent="">
+		<item name="android:layout_margin">2dp</item>
+		<item name="android:minHeight">88dp</item>
+		<item name="android:padding">8dp</item>
+		<item name="android:gravity">center</item>
+		<item name="android:focusable">true</item>
+		<item name="android:textAppearance">?attr/textAppearanceTitleMedium</item>
+	</style>
 </resources>

@@ -11,6 +11,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
+import com.google.android.material.R as materialR
 import androidx.activity.viewModels
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Spacer
@@ -23,9 +24,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.ColorUtils
-import androidx.core.text.bold
-import androidx.core.text.buildSpannedString
 import androidx.core.view.WindowInsetsCompat
 import dagger.hilt.android.AndroidEntryPoint
 import org.koitharu.kotatsu.R
@@ -72,6 +70,9 @@ class ReaderTapGridConfigActivity : BaseActivity<ActivityReaderTapActionsBinding
 			view.setOnLongClickListener(this)
 		}
 
+		viewBinding.gestureMode.addOnButtonCheckedListener { _, _, checked ->
+			if (checked) onContentChanged(viewModel.content.value)
+		}
 		viewModel.content.observe(this, ::onContentChanged)
 	}
 
@@ -109,7 +110,7 @@ class ReaderTapGridConfigActivity : BaseActivity<ActivityReaderTapActionsBinding
 
 	override fun onClick(v: View) {
 		val area = controls.findKeyByValue(v) ?: return
-		showActionSelector(area, isLongTap = false)
+		showActionSelector(area, isLongTap = viewBinding.modeHold.isChecked)
 	}
 
 	override fun onLongClick(v: View?): Boolean {
@@ -121,18 +122,16 @@ class ReaderTapGridConfigActivity : BaseActivity<ActivityReaderTapActionsBinding
 	private fun onContentChanged(content: Map<TapGridArea, ReaderTapGridConfigViewModel.TapActions>) {
 		controls.forEach { (area, view) ->
 			val actions = content[area]
-			view.text = buildSpannedString {
-				appendLine(getString(R.string.tap_action))
-				bold {
-					appendLine(actions?.tapAction.getText())
-				}
-				appendLine()
-				appendLine(getString(R.string.long_tap_action))
-				bold {
-					appendLine(actions?.longTapAction.getText())
-				}
+			val action = if (viewBinding.modeHold.isChecked) actions?.longTapAction else actions?.tapAction
+			val (surface, ink) = when (action) {
+				TapAction.PAGE_PREV, TapAction.CHAPTER_PREV -> materialR.attr.colorSecondaryContainer to materialR.attr.colorOnSecondaryContainer
+				TapAction.PAGE_NEXT, TapAction.CHAPTER_NEXT -> materialR.attr.colorPrimaryContainer to materialR.attr.colorOnPrimaryContainer
+				TapAction.TOGGLE_UI, TapAction.SHOW_MENU -> materialR.attr.colorTertiaryContainer to materialR.attr.colorOnTertiaryContainer
+				null -> materialR.attr.colorSurfaceContainerHigh to materialR.attr.colorOnSurfaceVariant
 			}
-			view.background = createBackground(area, actions?.tapAction)
+			view.text = action.getText()
+			view.setTextColor(MaterialColors.getColor(view, ink))
+			view.background = createBackground(area, MaterialColors.getColor(view, surface))
 		}
 	}
 
@@ -172,22 +171,16 @@ class ReaderTapGridConfigActivity : BaseActivity<ActivityReaderTapActionsBinding
 		}
 	}
 
-	private fun createBackground(area: TapGridArea, action: TapAction?): Drawable {
+	private fun createBackground(area: TapGridArea, fillColor: Int): Drawable {
 		val r = 24f * resources.displayMetrics.density
-		// Only the four corner cells are rounded, and only on their OUTER corner, so the whole
-		// grid reads as a single rounded rectangle while the inner cells stay square.
 		// cornerRadii order: top-left, top-right, bottom-right, bottom-left (x,y each).
+		val seam = 6f * resources.displayMetrics.density
 		val radii = when (area) {
-			TapGridArea.TOP_LEFT -> floatArrayOf(r, r, 0f, 0f, 0f, 0f, 0f, 0f)
-			TapGridArea.TOP_RIGHT -> floatArrayOf(0f, 0f, r, r, 0f, 0f, 0f, 0f)
-			TapGridArea.BOTTOM_RIGHT -> floatArrayOf(0f, 0f, 0f, 0f, r, r, 0f, 0f)
-			TapGridArea.BOTTOM_LEFT -> floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, r, r)
-			else -> floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f)
-		}
-		val fillColor = if (action == null) {
-			MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurfaceContainerHighest, Color.TRANSPARENT)
-		} else {
-			ColorUtils.setAlphaComponent(action.color, 70)
+			TapGridArea.TOP_LEFT -> floatArrayOf(r, r, seam, seam, seam, seam, seam, seam)
+			TapGridArea.TOP_RIGHT -> floatArrayOf(seam, seam, r, r, seam, seam, seam, seam)
+			TapGridArea.BOTTOM_RIGHT -> floatArrayOf(seam, seam, seam, seam, r, r, seam, seam)
+			TapGridArea.BOTTOM_LEFT -> floatArrayOf(seam, seam, seam, seam, seam, seam, r, r)
+			else -> floatArrayOf(seam, seam, seam, seam, seam, seam, seam, seam)
 		}
 		val base = GradientDrawable().apply {
 			shape = GradientDrawable.RECTANGLE

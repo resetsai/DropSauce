@@ -45,11 +45,6 @@ fun FavouritesCategoryEditScreen(
 	onNameChange: (String) -> Unit,
 	sortOrder: ListSortOrder,
 	onSortOrderChange: (ListSortOrder) -> Unit,
-	isTrackerSectionVisible: Boolean,
-	isTrackerEnabled: Boolean,
-	onTrackerChange: (Boolean) -> Unit,
-	isDownloadEnabled: Boolean,
-	onDownloadChange: (Boolean) -> Unit,
 	isShelfEnabled: Boolean,
 	onShelfChange: (Boolean) -> Unit,
 	error: String?,
@@ -90,33 +85,6 @@ fun FavouritesCategoryEditScreen(
 			modifier = Modifier.fillMaxWidth(),
 			title = stringResource(R.string.options),
 		) {
-			if (isTrackerSectionVisible) {
-				item { position ->
-					SwitchSettingsItem(
-						title = stringResource(R.string.check_for_new_chapters),
-						subtitle = stringResource(R.string.category_tracker_summary),
-						icon = R.drawable.ic_updated,
-						checked = isTrackerEnabled,
-						onCheckedChange = onTrackerChange,
-						shape = position.shape,
-						enabled = enabled,
-						modifier = Modifier.fillMaxWidth(),
-					)
-				}
-				item { position ->
-					SwitchSettingsItem(
-						title = stringResource(R.string.download_new_chapters),
-						subtitle = stringResource(R.string.category_download_summary),
-						icon = R.drawable.ic_download,
-						checked = isDownloadEnabled,
-						onCheckedChange = onDownloadChange,
-						shape = position.shape,
-						// Downloading new chapters is meaningless while the category is not tracked.
-						enabled = enabled && isTrackerEnabled,
-						modifier = Modifier.fillMaxWidth(),
-					)
-				}
-			}
 			item { position ->
 				SwitchSettingsItem(
 					title = stringResource(R.string.show_on_shelf),

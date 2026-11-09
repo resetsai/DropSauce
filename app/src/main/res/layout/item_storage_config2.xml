@@ -5,6 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    style="?attr/materialCardViewFilledStyle"
+    app:cardCornerRadius="24dp"
     tools:layout_margin="@dimen/screen_padding">
 
     <LinearLayout
@@ -20,7 +22,7 @@
             android:layout_marginHorizontal="@dimen/screen_padding"
             android:layout_marginTop="@dimen/screen_padding"
             android:ellipsize="end"
-            android:singleLine="true"
+            android:maxLines="2"
             android:textAppearance="?attr/textAppearanceTitleMedium"
             tools:text="@tools:sample/lorem[3]" />
 
@@ -30,38 +32,17 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/screen_padding"
             android:layout_marginTop="@dimen/margin_small"
-            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textAppearance="?attr/textAppearanceBodySmall"
             tools:text="@tools:sample/lorem[5]" />
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/textView_size"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/screen_padding"
-            android:layout_marginTop="@dimen/screen_padding"
-            android:baselineAligned="false"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/textView_size"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/margin_small"
-                android:layout_weight="1"
-                android:singleLine="true"
-                android:textAppearance="?attr/textAppearanceBodyMedium"
-                android:textColor="?android:textColorSecondary"
-                tools:text="250MB / 10GB" />
-
-            <com.google.android.material.progressindicator.LinearProgressIndicator
-                android:id="@+id/indicator_size"
-                android:layout_width="160dp"
-                android:layout_height="wrap_content"
-                app:trackCornerRadius="5dp"
-                app:trackThickness="10dp"
-                tools:progress="40" />
-
-        </LinearLayout>
+            android:layout_marginTop="12dp"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:textColor="?attr/colorPrimary" />
 
         <TextView
             android:id="@+id/textView_info"

@@ -38,8 +38,6 @@ class FavouritesCategoryEditActivity :
 	private val name = mutableStateOf("")
 	// Lazy: the view model (and the default sort it holds) is only reachable once the activity is attached.
 	private val sortOrder by lazy { mutableStateOf(viewModel.defaultSortOrder) }
-	private val isTrackerEnabled = mutableStateOf(true)
-	private val isDownloadEnabled = mutableStateOf(false)
 	private val isShelfEnabled = mutableStateOf(true)
 	private val error = mutableStateOf<String?>(null)
 	private val bottomInset = mutableIntStateOf(0)
@@ -67,7 +65,6 @@ class FavouritesCategoryEditActivity :
 			DropSauceTheme {
 				val density = LocalDensity.current
 				val isLoading by viewModel.isLoading.collectAsState()
-				val isTrackerSectionVisible by viewModel.isTrackerEnabled.collectAsState()
 
 				FavouritesCategoryEditScreen(
 					name = name.value,
@@ -78,17 +75,6 @@ class FavouritesCategoryEditActivity :
 					sortOrder = sortOrder.value,
 					onSortOrderChange = {
 						sortOrder.value = it
-						updateDoneButton()
-					},
-					isTrackerSectionVisible = isTrackerSectionVisible,
-					isTrackerEnabled = isTrackerEnabled.value,
-					onTrackerChange = {
-						isTrackerEnabled.value = it
-						updateDoneButton()
-					},
-					isDownloadEnabled = isDownloadEnabled.value,
-					onDownloadChange = {
-						isDownloadEnabled.value = it
 						updateDoneButton()
 					},
 					isShelfEnabled = isShelfEnabled.value,
@@ -126,8 +112,6 @@ class FavouritesCategoryEditActivity :
 		super.onSaveInstanceState(outState)
 		outState.putString(KEY_NAME, name.value)
 		outState.putSerializable(KEY_SORT_ORDER, sortOrder.value)
-		outState.putBoolean(KEY_TRACKER, isTrackerEnabled.value)
-		outState.putBoolean(KEY_DOWNLOAD, isDownloadEnabled.value)
 		outState.putBoolean(KEY_SHELF, isShelfEnabled.value)
 	}
 
@@ -137,8 +121,6 @@ class FavouritesCategoryEditActivity :
 		savedInstanceState.getSerializableCompat<ListSortOrder>(KEY_SORT_ORDER)?.let {
 			sortOrder.value = it
 		}
-		isTrackerEnabled.value = savedInstanceState.getBoolean(KEY_TRACKER, true)
-		isDownloadEnabled.value = savedInstanceState.getBoolean(KEY_DOWNLOAD, false)
 		isShelfEnabled.value = savedInstanceState.getBoolean(KEY_SHELF, true)
 		isSeeded = true
 		updateDoneButton()
@@ -149,9 +131,6 @@ class FavouritesCategoryEditActivity :
 			R.id.button_done -> viewModel.save(
 				title = name.value.trim(),
 				sortOrder = sortOrder.value,
-				isTrackerEnabled = isTrackerEnabled.value,
-				// A category that is not tracked can never produce new chapters to download.
-				isNewChaptersDownloadEnabled = isDownloadEnabled.value && isTrackerEnabled.value,
 				isVisibleOnShelf = isShelfEnabled.value,
 			)
 		}
@@ -167,16 +146,12 @@ class FavouritesCategoryEditActivity :
 		baseline = FormState(
 			name = category.title,
 			sortOrder = category.order,
-			isTrackerEnabled = category.isTrackingEnabled,
-			isDownloadEnabled = category.isNewChaptersDownloadEnabled,
 			isShelfEnabled = category.isVisibleInLibrary,
 		)
 		if (!isSeeded) {
 			isSeeded = true
 			name.value = baseline.name
 			sortOrder.value = baseline.sortOrder
-			isTrackerEnabled.value = baseline.isTrackerEnabled
-			isDownloadEnabled.value = baseline.isDownloadEnabled
 			isShelfEnabled.value = baseline.isShelfEnabled
 		}
 		updateDoneButton()
@@ -185,8 +160,6 @@ class FavouritesCategoryEditActivity :
 	private fun currentFormState() = FormState(
 		name = name.value.trim(),
 		sortOrder = sortOrder.value,
-		isTrackerEnabled = isTrackerEnabled.value,
-		isDownloadEnabled = isDownloadEnabled.value,
 		isShelfEnabled = isShelfEnabled.value,
 	)
 
@@ -200,8 +173,6 @@ class FavouritesCategoryEditActivity :
 	private data class FormState(
 		val name: String = "",
 		val sortOrder: ListSortOrder,
-		val isTrackerEnabled: Boolean = true,
-		val isDownloadEnabled: Boolean = false,
 		val isShelfEnabled: Boolean = true,
 	)
 
@@ -210,8 +181,6 @@ class FavouritesCategoryEditActivity :
 		const val NO_ID = -1L
 		private const val KEY_SORT_ORDER = "sort"
 		private const val KEY_NAME = "name"
-		private const val KEY_TRACKER = "tracker"
-		private const val KEY_DOWNLOAD = "download"
 		private const val KEY_SHELF = "shelf"
 	}
 }

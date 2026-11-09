@@ -35,10 +35,6 @@ class FavouritesCategoryEditViewModel @Inject constructor(
 	val onSaved = MutableEventFlow<Unit>()
 	val category = MutableStateFlow<FavouriteCategory?>(null)
 
-	val isTrackerEnabled = flow {
-		emit(settings.isTrackerEnabled && AppSettings.TRACK_FAVOURITES in settings.trackSources)
-	}.stateIn(viewModelScope + Dispatchers.Default, SharingStarted.Eagerly, false)
-
 	init {
 		launchLoadingJob(Dispatchers.Default) {
 			category.value = if (categoryId != NO_ID) {
@@ -52,8 +48,6 @@ class FavouritesCategoryEditViewModel @Inject constructor(
 	fun save(
 		title: String,
 		sortOrder: ListSortOrder,
-		isTrackerEnabled: Boolean,
-		isNewChaptersDownloadEnabled: Boolean,
 		isVisibleOnShelf: Boolean,
 	) {
 		launchLoadingJob(Dispatchers.Default) {
@@ -62,17 +56,18 @@ class FavouritesCategoryEditViewModel @Inject constructor(
 				repository.createCategory(
 					title = title,
 					sortOrder = sortOrder,
-					isTrackerEnabled = isTrackerEnabled,
-					isNewChaptersDownloadEnabled = isNewChaptersDownloadEnabled,
+					isTrackerEnabled = false,
+					isNewChaptersDownloadEnabled = false,
 					isVisibleOnShelf = isVisibleOnShelf,
 				)
 			} else {
+				val previous = checkNotNull(repository.getCategory(categoryId))
 				repository.updateCategory(
 					id = categoryId,
 					title = title,
 					sortOrder = sortOrder,
-					isTrackerEnabled = isTrackerEnabled,
-					isNewChaptersDownloadEnabled = isNewChaptersDownloadEnabled,
+					isTrackerEnabled = previous.isTrackingEnabled,
+					isNewChaptersDownloadEnabled = previous.isNewChaptersDownloadEnabled,
 					isVisibleOnShelf = isVisibleOnShelf,
 				)
 			}

@@ -63,8 +63,8 @@ class UpdatesViewModel @Inject constructor(
 				quickFilter.filterItem(filters),
 				EmptyState(
 					icon = R.drawable.ic_empty_history,
-					textPrimary = R.string.text_history_holder_primary,
-					textSecondary = R.string.text_history_holder_secondary,
+					textPrimary = R.string.no_recorded_updates,
+					textSecondary = 0,
 					actionStringRes = 0,
 				),
 			)

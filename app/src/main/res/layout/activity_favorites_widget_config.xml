@@ -30,7 +30,7 @@
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			android:clipToPadding="false"
-			android:paddingBottom="96dp" />
+			android:paddingBottom="8dp" />
 
 		<TextView
 			android:id="@+id/text_empty"
@@ -46,7 +46,7 @@
 	</FrameLayout>
 
 	<com.google.android.material.card.MaterialCardView
-		style="?attr/materialCardViewElevatedStyle"
+		style="?attr/materialCardViewFilledStyle"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_marginHorizontal="12dp"
