@@ -1,5 +1,6 @@
 package org.koitharu.kotatsu.search.ui
 
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
@@ -10,8 +11,8 @@ class GlobalSearchScopeTest {
 	fun `global search uses a transparent selection handle window`() {
 		val layouts = listOf(
 			"layout/activity_main.xml",
-			"layout-w600dp-land/activity_main.xml",
-			"layout-w840dp/activity_main.xml",
+			"layout-w600dp-h480dp-land/activity_main.xml",
+			"layout-w840dp-h480dp/activity_main.xml",
 		)
 
 		assertTrue(layouts.all { resource(it).contains("@style/ThemeOverlay.Kotatsu.SearchText") })
@@ -20,23 +21,23 @@ class GlobalSearchScopeTest {
 	}
 
 	@Test
-	fun `scope choice on the results screen is persisted`() {
-		val settings = source("core/prefs/AppSettings.kt")
-		val search = source("search/ui/multi/SearchViewModel.kt")
-
-		assertTrue(settings.contains("varisGlobalSearchNovelScope:Boolean"))
-		assertTrue(settings.contains("KEY_GLOBAL_SEARCH_NOVEL_SCOPE"))
-		assertTrue(search.contains("MutableStateFlow(settings.isGlobalSearchNovelScope)"))
-		assertTrue(search.contains("settings.isGlobalSearchNovelScope=value"))
+	fun `offline search menu offers query kinds without remote source filters`() {
+		val menu = resource("menu/popup_search_kind.xml")
+		for (kind in listOf("simple", "title", "author", "tag")) {
+			assertTrue(menu.contains("@+id/action_kind_$kind"))
+		}
+		assertFalse(menu.contains("action_filter_pinned_only"))
+		assertFalse(menu.contains("action_filter_local_only"))
 	}
 
 	@Test
-	fun `global results use the Explore source classification everywhere`() {
+	fun `offline results include favorites history and local storage regardless of source kind`() {
 		val search = source("search/ui/multi/SearchViewModel.kt")
-
-		assertTrue(search.contains(".filter{it.isNovelSource==isNovelScope}"))
-		assertTrue(search.contains(".filter{it.source.isNovelSource==isNovelScope}"))
-		assertTrue(search.contains("searchLocal():SearchResultsListModel?=if(isNovelScope){null}"))
+		for (section in listOf("searchFavorites", "searchHistory", "searchLocal")) {
+			assertTrue(search.contains("appendResult($section())"))
+		}
+		assertFalse(search.contains("isNovelSource"))
+		assertFalse(search.contains("isNovelScope"))
 	}
 
 	private fun resource(relativePath: String): String {
