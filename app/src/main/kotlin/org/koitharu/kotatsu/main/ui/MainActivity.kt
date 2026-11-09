@@ -226,12 +226,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), AppBarOwner, BottomNav
 	override fun onFragmentChanged(
 		fragment: Fragment,
 		fromUser: Boolean,
-		transition: MainNavigationDelegate.TabTransition,
 	) {
-		viewBinding.textViewTitle.text = navigationDelegate.titleFor(fragment)
-		viewBinding.textViewTitle.isVisible = resources.configuration.screenHeightDp >= 480
+		viewBinding.libraryHeading.textViewTitle.text = navigationDelegate.titleFor(fragment)
 		adjustFabVisibility(topFragment = fragment)
-		adjustAppbar(topFragment = fragment, transition = transition)
+		adjustAppbar(fragment)
 		if (fromUser) {
 			actionModeDelegate.finishActionMode()
 			viewBinding.appbar.setExpanded(true)
@@ -436,15 +434,15 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), AppBarOwner, BottomNav
 	// The appbar keeps fitsSystemWindows=false on every tab: the WindowInsetHolder child provides the
 	// status bar clearance. Toggling fitsSystemWindows per-tab (as Favourites used to) left AppBarLayout
 	// with a stale pinned-inset region and scroll range after switching, randomly locking it expanded.
-	private fun adjustAppbar(topFragment: Fragment, transition: MainNavigationDelegate.TabTransition) {
+	private fun adjustAppbar(topFragment: Fragment) {
 		if (topFragment is FavouritesContainerFragment) {
 			fadingAppbarMediator.bind()
-			topFragment.showTabsInAppBar(transition)
+			topFragment.showCategoryTabs()
 		} else {
 			fadingAppbarMediator.unbind()
 			val favourites = supportFragmentManager
 				.findFragmentByTag(FavouritesContainerFragment::class.java.name)
-			(favourites as? FavouritesContainerFragment)?.hideTabsFromAppBar(transition)
+			(favourites as? FavouritesContainerFragment)?.hideCategoryTabs()
 		}
 	}
 

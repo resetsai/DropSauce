@@ -14,18 +14,4 @@
 		android:valueFrom="0dp"
 		android:valueTo="@dimen/nav_tab_exit_distance_negative"
 		android:valueType="floatType" />
-	<objectAnimator
-		android:duration="@integer/nav_tab_exit_duration"
-		android:interpolator="@interpolator/m3_easing_emphasized_accelerate"
-		android:propertyName="scaleX"
-		android:valueFrom="1"
-		android:valueTo="0.985"
-		android:valueType="floatType" />
-	<objectAnimator
-		android:duration="@integer/nav_tab_exit_duration"
-		android:interpolator="@interpolator/m3_easing_emphasized_accelerate"
-		android:propertyName="scaleY"
-		android:valueFrom="1"
-		android:valueTo="0.985"
-		android:valueType="floatType" />
 </set>

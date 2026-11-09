@@ -36,18 +36,12 @@
 			android:fitsSystemWindows="true"
 			app:layout_scrollFlags="scroll|enterAlways|snap" />
 
-		<TextView
-			android:id="@+id/textView_title"
+		<include
+			android:id="@+id/library_heading"
+			layout="@layout/layout_library_heading"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:accessibilityHeading="true"
-			android:paddingHorizontal="20dp"
-			android:paddingTop="4dp"
-			android:paddingBottom="6dp"
-			android:textAppearance="?attr/textAppearanceHeadlineMedium"
-			android:textColor="?attr/colorOnSurface"
-			app:layout_scrollFlags="scroll|enterAlways|snap"
-			tools:text="@string/history" />
+			app:layout_scrollFlags="scroll|enterAlways|snap" />
 
 		<LinearLayout
 			android:id="@+id/layout_search"

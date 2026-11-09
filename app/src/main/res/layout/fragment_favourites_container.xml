@@ -11,7 +11,10 @@
 		android:id="@+id/tabs"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_marginTop="-10dp"
+		app:tabMinWidth="48dp"
+		app:tabPaddingStart="10dp"
+		app:tabPaddingEnd="10dp"
+		app:tabSelectedTextColor="?attr/colorPrimary"
 		android:background="@null"
 		app:tabGravity="start"
 		app:tabMode="scrollable" />

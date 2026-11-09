@@ -240,7 +240,12 @@
 
 	<style name="Widget.Kotatsu.Chip" parent="Widget.Material3.Chip.Suggestion" />
 
-	<style name="Widget.Kotatsu.Chip.Filter" parent="Widget.Material3.Chip.Filter" />
+	<style name="Widget.Kotatsu.Chip.Filter" parent="Widget.Material3.Chip.Filter">
+		<item name="shapeAppearance">@style/ShapeAppearance.Kotatsu.CornerFull</item>
+		<item name="chipMinHeight">40dp</item>
+		<item name="chipBackgroundColor">@color/library_filter_surface</item>
+		<item name="chipStrokeWidth">0dp</item>
+	</style>
 
 	<style name="Widget.Kotatsu.Chip.Assist" parent="Widget.Material3.Chip.Assist" />
 

@@ -267,9 +267,6 @@ class MainNavigationDelegate(
 			}
 			transaction.add(R.id.container, shownFragment, tag)
 		}
-		if (shownFragment is FavouritesContainerFragment && transition != TabTransition.NONE) {
-			shownFragment.isTabsAttachDeferred = true
-		}
 		transaction.setMaxLifecycle(shownFragment, Lifecycle.State.RESUMED)
 		transaction.runOnCommit {
 			val shown = primaryFragment ?: shownFragment
@@ -277,7 +274,7 @@ class MainNavigationDelegate(
 			// Reset it to the top so every tab always opens at the top. Done here, before the first
 			// frame is drawn (and while the fade-in is still near-transparent), so there's no visible jump.
 			shown.resetContentToTop()
-			onFragmentChanged(shown, fromUser = true, transition)
+			onFragmentChanged(shown, fromUser = true)
 		}
 		transaction.commit()
 		return true
@@ -348,10 +345,9 @@ class MainNavigationDelegate(
 	private fun onFragmentChanged(
 		fragment: Fragment,
 		fromUser: Boolean,
-		transition: TabTransition = TabTransition.NONE,
 	) {
 		isEnabled = getItemId(fragment) != firstItem()?.itemId
-		listeners.forEach { it.onFragmentChanged(fragment, fromUser, transition) }
+		listeners.forEach { it.onFragmentChanged(fragment, fromUser) }
 	}
 
 	private fun createMenu(items: List<NavItem>, menu: Menu) {
@@ -445,23 +441,20 @@ class MainNavigationDelegate(
 		}
 	}
 
-	/** Direction the content moves in on a tab switch; [slideX]/[slideY] are that direction as a unit vector. */
-	enum class TabTransition(
+	private enum class TabTransition(
 		@AnimatorRes val enterAnimator: Int,
 		@AnimatorRes val exitAnimator: Int,
-		val slideX: Int,
-		val slideY: Int,
 	) {
-		NONE(0, 0, 0, 0),
-		LEFT(R.animator.nav_tab_enter_from_right, R.animator.nav_tab_exit_to_left, -1, 0),
-		RIGHT(R.animator.nav_tab_enter_from_left, R.animator.nav_tab_exit_to_right, 1, 0),
-		UP(R.animator.nav_tab_enter_from_bottom, R.animator.nav_tab_exit_to_top, 0, -1),
-		DOWN(R.animator.nav_tab_enter_from_top, R.animator.nav_tab_exit_to_bottom, 0, 1),
+		NONE(0, 0),
+		LEFT(R.animator.nav_tab_enter_from_right, R.animator.nav_tab_exit_to_left),
+		RIGHT(R.animator.nav_tab_enter_from_left, R.animator.nav_tab_exit_to_right),
+		UP(R.animator.nav_tab_enter_from_bottom, R.animator.nav_tab_exit_to_top),
+		DOWN(R.animator.nav_tab_enter_from_top, R.animator.nav_tab_exit_to_bottom),
 	}
 
 	fun interface OnFragmentChangedListener {
 
-		fun onFragmentChanged(fragment: Fragment, fromUser: Boolean, transition: TabTransition)
+		fun onFragmentChanged(fragment: Fragment, fromUser: Boolean)
 	}
 
 	companion object {
