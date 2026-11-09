@@ -435,6 +435,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), AppBarOwner, BottomNav
 	// status bar clearance. Toggling fitsSystemWindows per-tab (as Favourites used to) left AppBarLayout
 	// with a stale pinned-inset region and scroll range after switching, randomly locking it expanded.
 	private fun adjustAppbar(topFragment: Fragment) {
+		viewBinding.libraryHeading.root.visibility = if (topFragment is FavouritesContainerFragment && !topFragment.headingReady) View.INVISIBLE else View.VISIBLE
 		if (topFragment is FavouritesContainerFragment) {
 			fadingAppbarMediator.bind()
 			topFragment.showCategoryTabs()

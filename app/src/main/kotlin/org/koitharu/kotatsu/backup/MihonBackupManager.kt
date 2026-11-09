@@ -116,7 +116,7 @@ class MihonBackupManager @Inject constructor(
    * In a Mihon backup each manga references its categories by their [MihonBackupCategory.order]
    * value (see Mihon's `MangaBackupCreator`), so we key the lookup by order. Categories are reused
    * by title when one already exists, and favorited manga that belong to no category fall back to a
-   * single [DEFAULT_CATEGORY_TITLE] category.
+   * single default category.
    */
   private inner class CategoryResolver(
     private val backupCategories: List<MihonBackupCategory>,
@@ -138,7 +138,7 @@ class MihonBackupManager @Inject constructor(
         item.favorite && item.categories.none { idByOrder.containsKey(it) }
       }
       if (anyUncategorized) {
-        defaultCategoryId = categoryIdForTitle(DEFAULT_CATEGORY_TITLE)
+        defaultCategoryId = categoryIdForTitle(context.getString(R.string.system_default))
       }
     }
 
@@ -611,9 +611,7 @@ class MihonBackupManager @Inject constructor(
     return (normalizedIndex + 1) / chaptersCount.toFloat()
   }
 
-  private companion object {
-    const val DEFAULT_CATEGORY_TITLE = "Default"
-  }
+
 }
 
 

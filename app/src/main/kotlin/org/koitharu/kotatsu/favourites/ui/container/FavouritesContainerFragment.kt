@@ -41,6 +41,9 @@ class FavouritesContainerFragment : BaseFragment<FragmentFavouritesContainerBind
 
 	private val viewModel: FavouritesContainerViewModel by viewModels()
 
+	var headingReady = false
+		private set
+
 	private var tabMediator: TabLayoutMediator? = null
 
 	override val recyclerView: RecyclerView?
@@ -67,13 +70,21 @@ class FavouritesContainerFragment : BaseFragment<FragmentFavouritesContainerBind
 			showCategoryTabs()
 		}
 		actionModeDelegate.addListener(this)
-		viewModel.categories.observe(viewLifecycleOwner, pagerAdapter)
-		viewModel.isEmpty.observe(viewLifecycleOwner, ::onEmptyStateChanged)
+		viewModel.categories.observe(viewLifecycleOwner) { categories ->
+			if (categories != null) {
+				pagerAdapter.emit(categories)
+				onEmptyStateChanged(categories.isEmpty())
+				headingReady = true
+				val host = activity?.findViewById<ViewGroup>(R.id.category_tabs_host)
+				if (host != null && binding.tabs.parent === host) (host.parent as View).visibility = View.VISIBLE
+			}
+		}
 		addMenuProvider(FavouritesContainerMenuProvider(router))
 		viewModel.onActionDone.observeEvent(viewLifecycleOwner, ReversibleActionObserver(binding.pager))
 	}
 
 	override fun onDestroyView() {
+		headingReady = false
 		tabMediator?.detach()
 		tabMediator = null
 		hideCategoryTabs()
@@ -150,7 +161,9 @@ class FavouritesContainerFragment : BaseFragment<FragmentFavouritesContainerBind
 			(tabs.parent as? ViewGroup)?.removeView(tabs)
 			host.addView(tabs, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
 		}
+		(host.parent as View).visibility = if (headingReady) View.VISIBLE else View.INVISIBLE
 	}
+
 
 	fun hideCategoryTabs() {
 		val tabs = viewBinding?.tabs ?: return

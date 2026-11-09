@@ -5,8 +5,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.plus
 import org.koitharu.kotatsu.R
@@ -30,20 +29,16 @@ class FavouritesContainerViewModel @Inject constructor(
 
 	val onActionDone = MutableEventFlow<ReversibleAction>()
 
-	private val categoriesStateFlow = favouritesRepository.observeCategoriesForLibrary()
-		.withErrorHandling()
-		.stateIn(viewModelScope + Dispatchers.Default, SharingStarted.Eagerly, null)
-
 	val categories = combine(
-		categoriesStateFlow.filterNotNull(),
+		favouritesRepository.observeCategoriesForLibrary(),
 		observeAllFavouritesVisibility(),
 	) { list, showAll ->
 		list.toUi(showAll)
-	}.stateIn(viewModelScope + Dispatchers.Default, SharingStarted.Eagerly, emptyList())
-
-	val isEmpty = categoriesStateFlow.map {
-		it?.isEmpty() == true
-	}.stateIn(viewModelScope + Dispatchers.Default, SharingStarted.Eagerly, false)
+	}.catch {
+		emit(emptyList())
+		throw it
+	}.withErrorHandling()
+		.stateIn(viewModelScope + Dispatchers.Default, SharingStarted.Eagerly, null)
 
 	private fun List<FavouriteCategory>.toUi(showAll: Boolean): List<FavouriteTabModel> {
 		if (isEmpty()) {

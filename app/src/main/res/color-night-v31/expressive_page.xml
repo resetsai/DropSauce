@@ -1,0 +1,3 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:color="@android:color/system_accent2_500" android:lStar="9" />
+</selector>
