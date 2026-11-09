@@ -87,6 +87,10 @@ private enum class SettingsSection(
 		R.string.storage_usage, R.drawable.ic_usage, "storage",
 		intArrayOf(R.string.data_removal), StorageAndNetworkSettingsFragment::class.java,
 	),
+	STATISTICS(
+		R.string.reading_stats, R.drawable.ic_timelapse, "services",
+		intArrayOf(R.string.reading_time_estimation, R.string.eye_reminder), ServicesSettingsFragment::class.java,
+	),
 	BACKUP(
 		R.string.backup_restore, R.drawable.ic_backup_restore, "backup",
 		intArrayOf(R.string.restore_backup),
@@ -125,4 +129,3 @@ private fun RootSettingsContent(
 		item { Spacer(Modifier.height(24.dp).fillMaxWidth()) }
 	}
 }
-

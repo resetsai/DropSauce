@@ -90,7 +90,6 @@ import org.koitharu.kotatsu.parsers.util.mapToArray
 import org.koitharu.kotatsu.reader.ui.colorfilter.ColorFilterConfigActivity
 import org.koitharu.kotatsu.reader.ui.config.ReaderConfigSheet
 import org.koitharu.kotatsu.scrobbling.common.domain.model.ScrobblerService
-import org.koitharu.kotatsu.scrobbling.common.ui.config.ScrobblerConfigActivity
 import org.koitharu.kotatsu.scrobbling.common.ui.selector.ScrobblingSelectorSheet
 import org.koitharu.kotatsu.search.domain.SearchKind
 import org.koitharu.kotatsu.search.ui.MangaListActivity
@@ -333,15 +332,6 @@ class AppRouter private constructor(
 
 
     fun openReaderTapGridSettings() = startActivity(ReaderTapGridConfigActivity::class.java)
-
-    fun openScrobblerSettings(scrobbler: ScrobblerService) {
-        startActivity(
-            Intent(contextOrNull() ?: return, ScrobblerConfigActivity::class.java)
-                .putExtra(KEY_ID, scrobbler.id),
-        )
-    }
-
-
 
     fun openStatistic() = startActivity(StatsActivity::class.java)
 

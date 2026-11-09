@@ -32,7 +32,6 @@ import org.koitharu.kotatsu.parsers.exception.NotFoundException
 import org.koitharu.kotatsu.parsers.model.Manga
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.koitharu.kotatsu.scrobbling.common.domain.ScrobblerAuthRequiredException
-import org.koitharu.kotatsu.scrobbling.common.ui.ScrobblerAuthHelper
 import org.koitharu.kotatsu.settings.sources.auth.SourceAuthActivity
 import java.security.cert.CertPathValidatorException
 import javax.inject.Inject
@@ -45,7 +44,6 @@ import kotlin.coroutines.suspendCoroutine
 class ExceptionResolver private constructor(
     private val host: Host,
     private val settings: AppSettings,
-    private val scrobblerAuthHelperProvider: Provider<ScrobblerAuthHelper>,
 ) {
     private val continuations = MutableScatterMap<String, Continuation<Boolean>>(1)
 
@@ -98,18 +96,6 @@ class ExceptionResolver private constructor(
             is UnsupportedSourceException -> {
                 e.manga?.let { openAlternatives(it) }
                 false
-            }
-
-            is ScrobblerAuthRequiredException -> {
-                val authHelper = scrobblerAuthHelperProvider.get()
-                if (authHelper.isAuthorized(e.scrobbler)) {
-                    true
-                } else {
-                    host.withContext {
-                        authHelper.startAuth(this, e.scrobbler).onFailure(::showErrorDetails)
-                    }
-                    false
-                }
             }
 
             else -> false
@@ -166,19 +152,16 @@ class ExceptionResolver private constructor(
 
     class Factory @Inject constructor(
         private val settings: AppSettings,
-        private val scrobblerAuthHelperProvider: Provider<ScrobblerAuthHelper>,
     ) {
 
         fun create(fragment: Fragment) = ExceptionResolver(
             host = Host.FragmentHost(fragment),
             settings = settings,
-            scrobblerAuthHelperProvider = scrobblerAuthHelperProvider,
         )
 
         fun create(activity: FragmentActivity) = ExceptionResolver(
             host = Host.ActivityHost(activity),
             settings = settings,
-            scrobblerAuthHelperProvider = scrobblerAuthHelperProvider,
         )
     }
 

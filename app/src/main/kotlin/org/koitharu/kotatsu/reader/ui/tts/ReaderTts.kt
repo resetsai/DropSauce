@@ -285,7 +285,9 @@ class ReaderTts @Inject constructor(
 			return
 		}
 		applySettings()
-		if (engine.voice?.isNetworkConnectionRequired != false) {
+		if (engine.voice?.let { !it.isNetworkConnectionRequired && !it.isInstallRequired() } != true) {
+			android.widget.Toast.makeText(context, org.koitharu.kotatsu.R.string.tts_offline_voice_required,
+				android.widget.Toast.LENGTH_LONG).show()
 			_isPlaying.value = false
 			return
 		}

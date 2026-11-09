@@ -23,7 +23,7 @@ import org.koitharu.kotatsu.core.model.ContentWarning
 
 @Singleton
 class MihonExtensionLoader @Inject constructor(
-	
+
 ) {
 
 	/**

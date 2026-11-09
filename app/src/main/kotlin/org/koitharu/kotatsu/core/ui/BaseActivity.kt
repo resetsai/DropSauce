@@ -51,6 +51,15 @@ abstract class BaseActivity<B : ViewBinding> :
 	OnApplyWindowInsetsListener,
 	ScreenshotPolicyHelper.ContentContainer {
 
+	@Deprecated("Activity result contracts also dispatch through this method")
+	override fun startActivityForResult(intent: Intent, requestCode: Int, options: Bundle?) {
+		when (intent.action) {
+			Intent.ACTION_OPEN_DOCUMENT, Intent.ACTION_OPEN_DOCUMENT_TREE,
+			Intent.ACTION_CREATE_DOCUMENT, Intent.ACTION_GET_CONTENT -> intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true)
+		}
+		super.startActivityForResult(intent, requestCode, options)
+	}
+
 	private var isAmoledTheme = false
 
 	lateinit var viewBinding: B

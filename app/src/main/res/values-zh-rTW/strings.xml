@@ -545,4 +545,5 @@
     <string name="downloads_background">背景下載</string>
     <string name="download_new_chapters">下載新的漫畫章節</string>
     <string name="auto_double_foldable">摺疊設備自動雙頁</string>
+    <string name="tts_offline_voice_required">請在系統的文字轉語音設定中選擇已安裝的離線語音。</string>
 </resources>
