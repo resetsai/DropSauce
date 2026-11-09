@@ -1330,4 +1330,7 @@
     <string name="offline_source_unavailable">This source is unavailable offline. Import a local copy to read this title.</string>
     <string name="offline_sources_title">Unavailable sources</string>
     <string name="offline_sources_message">The following online sources are unavailable in the offline reader:\n%1$s</string>
+    <string name="search_offline_books">Search your library</string>
+    <string name="library_import_hint">Import an EPUB, comic archive or PDF from your device.</string>
+    <string name="offline_delete_read_chapters">Read chapters will be permanently removed from this device. To recover imported content, you will need the original files.</string>
 </resources>

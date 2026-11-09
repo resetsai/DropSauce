@@ -21,8 +21,10 @@
 		android:layout_toStartOf="@id/button_more"
 		android:gravity="center_vertical|start"
 		android:padding="@dimen/grid_spacing"
-		android:singleLine="true"
-		android:textAppearance="?textAppearanceTitleSmall"
+		android:maxLines="2"
+		android:ellipsize="end"
+		android:accessibilityHeading="true"
+		android:textAppearance="?textAppearanceTitleMedium"
 		tools:text="@tools:sample/lorem[2]" />
 
 	<com.google.android.material.button.MaterialButton

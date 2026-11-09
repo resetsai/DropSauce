@@ -133,7 +133,7 @@ class DataCleanupSettingsFragment : BaseComposeSettingsFragment(R.string.data_re
 			context = context,
 			icon = R.drawable.ic_delete,
 			title = context.getString(R.string.delete_read_chapters),
-			message = context.getString(R.string.delete_read_chapters_prompt),
+			message = context.getString(R.string.offline_delete_read_chapters),
 			confirmLabel = context.getString(R.string.delete),
 			destructive = true,
 		) { viewModel.cleanupChapters() }

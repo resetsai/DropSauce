@@ -129,26 +129,14 @@ data class FloatingNavBarColors(
 // hold swell, label morph, and drag drop settle) never snaps abruptly on the first frames.
 private val SmoothLiquidEasing = CubicBezierEasing(0.32f, 0f, 0.14f, 1f)
 private val SmoothSettleEasing = CubicBezierEasing(0.26f, 0f, 0.12f, 1f)
-private val LabelMorphEasing = CubicBezierEasing(0.16f, 0f, 0.12f, 1f)
-private val SmoothFadeInEasing = CubicBezierEasing(0.12f, 0f, 0.2f, 1f)
-private val SmoothFadeOutEasing = CubicBezierEasing(0.28f, 0f, 0.6f, 1f)
 
 private val MotionSizeSpec: FiniteAnimationSpec<IntSize> =
-	tween(durationMillis = 400, easing = SmoothLiquidEasing)
+	tween(durationMillis = TAP_DURATION_MS, easing = SmoothLiquidEasing)
 
 // Expand and shrink use the exact same duration and S-curve so outgoing and incoming labels
 // trade width 1:1 on every frame without making the outer bar jerk wider or narrower.
-private val LabelExpandSizeSpec: FiniteAnimationSpec<IntSize> =
-	tween(durationMillis = 330, easing = LabelMorphEasing)
-
-private val LabelShrinkSizeSpec: FiniteAnimationSpec<IntSize> =
-	tween(durationMillis = 330, easing = LabelMorphEasing)
-
-private val LabelFadeInSpec: FiniteAnimationSpec<Float> =
-	tween(durationMillis = 210, easing = SmoothFadeInEasing)
-
-private val LabelFadeOutSpec: FiniteAnimationSpec<Float> =
-	tween(durationMillis = 220, easing = SmoothFadeOutEasing)
+private val LabelFadeSpec: FiniteAnimationSpec<Float> =
+	tween(durationMillis = TAP_DURATION_MS, easing = SmoothLiquidEasing)
 
 private val MotionAlphaSpec: FiniteAnimationSpec<Float>
 	@Composable get() = MaterialTheme.motionScheme.defaultEffectsSpec()
@@ -162,10 +150,7 @@ private const val MAGNIFY_IN_DURATION_MS = 420
 private const val MAGNIFY_OUT_DURATION_MS = 460
 private const val DRAG_SETTLE_DURATION_MS = 440
 private const val WALL_RELEASE_DURATION_MS = 480
-private const val TAP_MIN_DURATION_MS = 350
-private const val TAP_MAX_DURATION_MS = 400
-private const val TAP_PER_TILE_MS = 16f
-private const val TAP_LABEL_SWAP_PROGRESS = 0.36f
+private const val TAP_DURATION_MS = 150
 private const val DRAG_FOLLOW_RATE = 16f
 private const val WALL_FOLLOW_RATE = 14f
 private const val MAX_WALL_SQUISH_Y = 0.045f
@@ -418,9 +403,6 @@ fun FloatingNavBar(
 	var hoveredIndex by remember { mutableIntStateOf(initialIndex) }
 	var pendingSelectedId by remember { mutableStateOf<Int?>(null) }
 	var unappliedDropId by remember { mutableStateOf<Int?>(null) }
-	// Which tab currently displays its text label: stays on the previous active menu while the
-	// selector pill travels across the bar (both on drag and on tap) and swaps once the pill arrives.
-	var labelOwnerId by remember { mutableIntStateOf(selectedId) }
 
 	var targetDragSlot by remember { mutableFloatStateOf(initialIndex.toFloat()) }
 	var displaySlot by remember { mutableFloatStateOf(initialIndex.toFloat()) }
@@ -517,9 +499,6 @@ fun FloatingNavBar(
 		else -> selectedId
 	}
 	val activeMenuIndex = items.indexOfFirst { it.id == activeMenuId }.coerceAtLeast(0)
-	if (labelOwnerId != activeMenuId && items.none { it.id == labelOwnerId }) {
-		labelOwnerId = activeMenuId
-	}
 
 	LaunchedEffect(activeMenuId, activeMenuIndex, isDragging, itemIds) {
 		if (isDragging) return@LaunchedEffect
@@ -535,7 +514,6 @@ fun FloatingNavBar(
 			dropOffsetCenterX = 0f
 			dropOffsetWidth = 0f
 			dropOffsetHeight = 0f
-			labelOwnerId = activeMenuId
 			flightStartSlot = target
 			flightTargetSlot = target
 			flightProgress.snapTo(1f)
@@ -544,7 +522,6 @@ fun FloatingNavBar(
 		val fromDrag = wasJustDragged
 		wasJustDragged = false
 		if (fromDrag) {
-			labelOwnerId = activeMenuId
 			val needsSettle = abs(dropOffsetCenterX) > 0.25f ||
 				abs(dropOffsetWidth) > 0.25f ||
 				abs(flightStartSlot - target) > 0.001f
@@ -571,33 +548,21 @@ fun FloatingNavBar(
 		}
 
 		val currentPos = lerp(flightStartSlot, flightTargetSlot, flightProgress.value)
-		if (abs(currentPos - target) <= 0.35f) {
-			labelOwnerId = activeMenuId
-		}
 		if (abs(currentPos - target) > 0.001f) {
-			val dist = abs(target - currentPos)
-			val tapDurationMs = (TAP_MIN_DURATION_MS + (dist - 1f).coerceAtLeast(0f) * TAP_PER_TILE_MS)
-				.roundToInt()
-				.coerceIn(TAP_MIN_DURATION_MS, TAP_MAX_DURATION_MS)
 			flightStartSlot = currentPos
 			flightTargetSlot = target
 			flightFromDrag = false
 			flightProgress.snapTo(0f)
 			flightProgress.animateTo(
 				targetValue = 1f,
-				animationSpec = tween(durationMillis = tapDurationMs, easing = SmoothLiquidEasing),
-			) {
-				if (labelOwnerId != activeMenuId && value >= TAP_LABEL_SWAP_PROGRESS) {
-					labelOwnerId = activeMenuId
-				}
-			}
+				animationSpec = tween(durationMillis = TAP_DURATION_MS, easing = SmoothLiquidEasing),
+			)
 		} else {
 			flightStartSlot = target
 			flightTargetSlot = target
 			flightProgress.snapTo(1f)
 		}
 		flightFromDrag = false
-		labelOwnerId = activeMenuId
 	}
 
 	// Per-frame values are read through functions from draw/layer lambdas only, so the pill
@@ -897,7 +862,6 @@ fun FloatingNavBar(
 								if (switchedTab) {
 									pendingSelectedId = targetId
 									unappliedDropId = targetId
-									labelOwnerId = targetId
 								}
 								flightProgress.snapTo(0f)
 								wallStretchAnim.snapTo(endWall)
@@ -1108,7 +1072,7 @@ fun FloatingNavBar(
 									item = item,
 									selected = item.id == activeMenuId,
 									iconChecked = iconChecked,
-									showLabel = showLabels && item.id == labelOwnerId,
+									showLabel = showLabels && item.id == activeMenuId,
 									contentColor = {
 										lerpColor(unselectedContentColor, selectedContentColor, pillCoverage())
 									},
@@ -1294,13 +1258,13 @@ private fun FloatingNavItem(
 			AnimatedVisibility(
 				visible = showLabel,
 				enter = expandHorizontally(
-					animationSpec = LabelExpandSizeSpec,
+					animationSpec = MotionSizeSpec,
 					expandFrom = Alignment.Start,
-				) + fadeIn(animationSpec = LabelFadeInSpec),
+				) + fadeIn(animationSpec = LabelFadeSpec),
 				exit = shrinkHorizontally(
-					animationSpec = LabelShrinkSizeSpec,
+					animationSpec = MotionSizeSpec,
 					shrinkTowards = Alignment.Start,
-				) + fadeOut(animationSpec = LabelFadeOutSpec),
+				) + fadeOut(animationSpec = LabelFadeSpec),
 			) {
 				// BasicText's color lambda is read at draw time, so the label recolors without recomposing.
 				BasicText(

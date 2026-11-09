@@ -23,11 +23,15 @@
 	<TextView
 		android:id="@+id/textView_highlight"
 		android:layout_width="match_parent"
-		android:layout_height="160dp"
+		android:layout_height="wrap_content"
+		android:minHeight="112dp"
+		android:ellipsize="end"
+		android:background="?attr/colorSecondaryContainer"
+		android:textColor="?attr/colorOnSecondaryContainer"
 		android:gravity="top|start"
 		android:maxLines="7"
 		android:padding="16dp"
-		android:textAppearance="?attr/textAppearanceBodyMedium"
+		android:textAppearance="?attr/textAppearanceBodyLarge"
 		android:visibility="gone"
 		tools:text="Selected EPUB text appears here as a remembered highlight."
 		tools:visibility="gone" />

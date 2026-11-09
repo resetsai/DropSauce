@@ -615,7 +615,7 @@ class EpubReaderFragment : BaseReaderFragment<FragmentReaderEpubBinding>() {
 		val width = drawable.intrinsicWidth.takeIf { it > 0 } ?: return null
 		val height = drawable.intrinsicHeight.takeIf { it > 0 } ?: return null
 		val metrics = resources.displayMetrics
-		val maxWidth = (metrics.widthPixels - 2 * effectiveHorizontalPadding * metrics.density).toInt().coerceAtLeast(1)
+		val maxWidth = (metrics.widthPixels - 2 * textGutterPx(metrics.widthPixels)).coerceAtLeast(1)
 		val maxHeight = (metrics.heightPixels * MAX_IMAGE_HEIGHT_FRACTION).toInt().coerceAtLeast(1)
 		val scale = minOf(1f, maxWidth / width.toFloat(), maxHeight / height.toFloat())
 		drawable.setBounds(0, 0, (width * scale).toInt().coerceAtLeast(1), (height * scale).toInt().coerceAtLeast(1))
@@ -956,8 +956,7 @@ class EpubReaderFragment : BaseReaderFragment<FragmentReaderEpubBinding>() {
 
 	private fun paginate(viewWidth: Int, viewHeight: Int, range: IntRange): List<NativePage> {
 		// Callers load [range] on IO first - see renderPaged/extendPageWindow.
-		val density = resources.displayMetrics.density
-		val horizontal = (effectiveHorizontalPadding * density).toInt().coerceAtLeast(1)
+		val horizontal = textGutterPx(viewWidth)
 		val verticalTop = verticalTopPaddingPx
 		val verticalBottom = verticalBottomPaddingPx
 		val width = (viewWidth - horizontal * 2).coerceAtLeast(1)
@@ -1083,7 +1082,7 @@ class EpubReaderFragment : BaseReaderFragment<FragmentReaderEpubBinding>() {
 		includeFontPadding = true
 		applyTextAlignment(this)
 		val density = resources.displayMetrics.density
-		val h = (effectiveHorizontalPadding * density).toInt()
+		val h = textGutterPx(this@EpubReaderFragment.view?.width ?: 0)
 		val top = if (paged) verticalTopPaddingPx else (20 * density).toInt()
 		val bottom = if (paged) verticalBottomPaddingPx else (36 * density).toInt()
 		setPadding(h, top, h, bottom)
@@ -1564,6 +1563,12 @@ class EpubReaderFragment : BaseReaderFragment<FragmentReaderEpubBinding>() {
 	private val effectiveLineHeight get() = if (settings.isEpubPublisherStyleEnabled) 120 else settings.epubLineHeight
 	private val effectiveParagraphSpacing get() =
 		if (settings.isEpubPublisherStyleEnabled) 0 else settings.epubParagraphSpacing
+	// The paginator and the displayed page must measure the same text column.
+	private fun textGutterPx(width: Int): Int {
+		val density = resources.displayMetrics.density
+		return maxOf(1, (effectiveHorizontalPadding * density).toInt(), (width - (680 * density).toInt()) / 2)
+	}
+
 	private val effectiveHorizontalPadding get() =
 		if (settings.isEpubPublisherStyleEnabled) PUBLISHER_HORIZONTAL_PADDING_DP else settings.epubHorizontalPadding
 	private val effectiveVerticalPadding get() =

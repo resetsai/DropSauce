@@ -39,7 +39,6 @@ class FavouritesListFragment : MangaListFragment() {
 		listener = this,
 		sizeResolver = DynamicItemSizeResolver(resources, viewLifecycleOwner, settings, adjustWidth = false),
 		titleTapToRead = settings.isTitleTapToReadEnabled,
-		onTipClose = { viewModel.dismissScalingTip() },
 	)
 
 	override fun onScrolledToEnd() = viewModel.requestMoreItems()

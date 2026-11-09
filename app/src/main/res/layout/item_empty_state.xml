@@ -31,9 +31,11 @@
 		android:id="@+id/textSecondary"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_marginTop="@dimen/margin_normal"
+		android:layout_marginTop="4dp"
+		android:maxWidth="360dp"
+		android:textColor="?attr/colorOnSurfaceVariant"
 		android:gravity="center"
-		android:textAppearance="?attr/textAppearanceBodyMedium"
+		android:textAppearance="?attr/textAppearanceBodyLarge"
 		tools:text="@tools:sample/lorem[15]" />
 
 	<com.google.android.material.button.MaterialButton

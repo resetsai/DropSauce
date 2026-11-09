@@ -21,7 +21,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,7 +44,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
-import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import org.koitharu.kotatsu.R
@@ -53,8 +51,6 @@ import org.koitharu.kotatsu.core.model.getTitle
 import org.koitharu.kotatsu.core.model.isLocal
 import org.koitharu.kotatsu.core.model.titleResId
 import org.koitharu.kotatsu.core.parser.favicon.faviconUri
-import org.koitharu.kotatsu.core.util.ext.isRemoteCoverUrl
-import org.koitharu.kotatsu.core.util.ext.mangaCoverDiskCacheKey
 import org.koitharu.kotatsu.core.util.ext.mangaSourceExtra
 import org.koitharu.kotatsu.core.util.ext.stableMangaCoverKey
 import org.koitharu.kotatsu.details.data.MangaDetails
@@ -104,7 +100,6 @@ internal fun HeroSection(
 					.height(COVER_HEIGHT),
 				corner = 24.dp,
 				nsfwLabel = null,
-				forceRefresh = details?.isLoaded == true,
 				actions = actions,
 			)
 			Spacer(Modifier.height(20.dp))
@@ -174,7 +169,6 @@ internal fun HeroSection(
 						modifier = Modifier.width(COMPACT_COVER_WIDTH),
 						corner = 20.dp,
 						nsfwLabel = nsfwLabel,
-						forceRefresh = details?.isLoaded == true,
 						actions = actions,
 					)
 					Column {
@@ -245,7 +239,6 @@ internal fun CoverCard(
 	modifier: Modifier,
 	corner: Dp,
 	nsfwLabel: String?,
-	forceRefresh: Boolean,
 	actions: DetailsExpressiveActions,
 ) {
 	val ctx = LocalContext.current
@@ -260,7 +253,6 @@ internal fun CoverCard(
 		// decided against the pristine manga - otherwise a custom cover is stored under the source
 		// cover's key and keeps showing in lists after the override is reverted.
 		val keyManga = sourceManga ?: manga
-		val isSourceCover = coverUrl == keyManga.coverUrl || coverUrl == keyManga.largeCoverUrl
 		val coverRequest = remember(coverUrl, manga.id, manga.source, keyManga, coverRefreshes) {
 			ImageRequest.Builder(ctx)
 				.data(coverUrl)
@@ -269,35 +261,17 @@ internal fun CoverCard(
 				.stableMangaCoverKey(keyManga, coverUrl)
 				.build()
 		}
-		// Refresh the source cover even while an override hides it, so reverting shows the current
-		// one straight away instead of a stale copy.
-		// Not for extension covers: their fetcher caches by url like Mihon (a changed cover comes
-		// with a new url), so this only re-downloaded the same image on every open, competing with
-		// the details request. Like in Mihon, pulling the page down downloads them again instead.
-		val refreshUrl = if (isSourceCover) coverUrl else keyManga.coverUrl
-		if (forceRefresh && isRemoteCoverUrl(refreshUrl) && !manga.source.name.startsWith("MIHON_")) {
-			LaunchedEffect(manga.id, refreshUrl) {
-				imageLoader.enqueue(
-					ImageRequest.Builder(ctx)
-						.data(refreshUrl)
-						.mangaSourceExtra(manga.source)
-						.diskCacheKey(mangaCoverDiskCacheKey(manga.id))
-						.diskCachePolicy(CachePolicy.WRITE_ONLY)
-						.memoryCachePolicy(CachePolicy.DISABLED)
-						.networkCachePolicy(CachePolicy.ENABLED)
-						.build(),
-				)
-			}
-		}
 		Box(modifier = Modifier.fillMaxSize()) {
 			AsyncImage(
 				model = coverRequest,
+				fallback = painterResource(R.drawable.bookplate_offline),
+				error = painterResource(R.drawable.bookplate_offline),
 				imageLoader = imageLoader,
 				contentDescription = null,
 				contentScale = ContentScale.Crop,
 				modifier = Modifier
 					.fillMaxSize()
-					.clickable { actions.onCoverClick(manga) },
+					.clickable(enabled = !coverUrl.isNullOrBlank()) { actions.onCoverClick(manga) },
 			)
 			if (nsfwLabel != null) {
 				Surface(

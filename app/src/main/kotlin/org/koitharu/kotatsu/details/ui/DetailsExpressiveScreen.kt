@@ -2,6 +2,7 @@
 
 package org.koitharu.kotatsu.details.ui
 
+import org.koitharu.kotatsu.core.ui.ReadingPanes
 import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -127,90 +128,92 @@ fun DetailsExpressiveScreen(
 			horizontalAlignment = Alignment.CenterHorizontally,
 		) {
 			// Push the hero clear of the translucent top bar / back button.
-		Spacer(Modifier.height(topInset + if (centered) 84.dp else 72.dp))
+			Spacer(Modifier.height(topInset + if (centered) 84.dp else 72.dp))
 
-		if (manga == null) {
-			LoadingHero()
-		} else {
-			val favLabel = favouriteLabel ?: stringResource(R.string.add_to_favourites)
-			val isFavourite = favouriteCount > 0
-			HeroSection(
-				centered = centered,
-				manga = manga,
-				details = details,
-				sourceTitle = sourceTitle,
-				accent = accentColor,
-				imageLoader = imageLoader,
-				coverUrl = coverUrl,
-				coverRefreshes = coverRefreshes,
-				favouriteLabel = favLabel,
-				isFavourite = isFavourite,
-				onFavouriteClick = { actions.onFavoriteClick(manga) },
-				actions = actions,
-			)
+			if (manga == null) {
+				LoadingHero()
+			} else {
+				val favLabel = favouriteLabel ?: stringResource(R.string.add_to_favourites)
+				val isFavourite = favouriteCount > 0
+				ReadingPanes(leading = {
+					HeroSection(
+						centered = centered,
+						manga = manga,
+						details = details,
+						sourceTitle = sourceTitle,
+						accent = accentColor,
+						imageLoader = imageLoader,
+						coverUrl = coverUrl,
+						coverRefreshes = coverRefreshes,
+						favouriteLabel = favLabel,
+						isFavourite = isFavourite,
+						onFavouriteClick = { actions.onFavoriteClick(manga) },
+						actions = actions,
+					)
 
-			if (centered) {
-				Spacer(Modifier.height(20.dp))
-				FavouriteButton(
-					label = favLabel,
-					isFavourite = isFavourite,
-					accent = accentColor,
-					onClick = { actions.onFavoriteClick(manga) },
-				)
-			}
+					if (centered) {
+						Spacer(Modifier.height(20.dp))
+						FavouriteButton(
+							label = favLabel,
+							isFavourite = isFavourite,
+							accent = accentColor,
+							onClick = { actions.onFavoriteClick(manga) },
+						)
+					}
+				}, trailing = {
+					Spacer(Modifier.height(8.dp))
+					ProgressCard(historyInfo = historyInfo, isLoading = isLoading, accent = accentColor)
 
-			Spacer(Modifier.height(8.dp))
-			ProgressCard(historyInfo = historyInfo, isLoading = isLoading, accent = accentColor)
+					DescriptionCard(
+						description = details.description,
+						manga = manga,
+						details = details,
+						accent = accentColor,
+					)
 
-			DescriptionCard(
-				description = details.description,
-				manga = manga,
-				details = details,
-				accent = accentColor,
-			)
+					TagsSection(tags = tags, accent = accentColor, onTagClick = actions.onTagClick)
 
-			TagsSection(tags = tags, accent = accentColor, onTagClick = actions.onTagClick)
+					if (scrobblings.isNotEmpty()) {
+						ScrobblingSection(
+							items = scrobblings,
+							imageLoader = imageLoader,
+							accent = accentColor,
+							onMore = actions.onScrobblingMore,
+							onCardClick = actions.onScrobblingCardClick,
+						)
+					}
 
-			if (scrobblings.isNotEmpty()) {
-				ScrobblingSection(
-					items = scrobblings,
-					imageLoader = imageLoader,
-					accent = accentColor,
-					onMore = actions.onScrobblingMore,
-					onCardClick = actions.onScrobblingCardClick,
-				)
-			}
+					if (related.isNotEmpty()) {
+						RelatedSection(
+							items = related,
+							accent = accentColor,
+							onMore = { actions.onRelatedMore(manga) },
+							onItemClick = actions.onRelatedClick,
+						)
+					}
 
-			if (related.isNotEmpty()) {
-				RelatedSection(
-					items = related,
-					accent = accentColor,
-					onMore = { actions.onRelatedMore(manga) },
-					onItemClick = actions.onRelatedClick,
-				)
-			}
-
-			if (localSize > 0L) {
-				LocalSizeRow(size = localSize, manga = manga, onClick = actions.onLocalClick)
-			}
+					if (localSize > 0L) {
+						LocalSizeRow(size = localSize, manga = manga, onClick = actions.onLocalClick)
+					}
+				})
 
 				Spacer(Modifier.height(28.dp))
 			}
 		}
 
-			// Floating action dock: a "N chapters" pill stacked above the read FAB. Both pin to the
-			// bottom-end and stay clear of the navigation bar; the modal chapters sheet draws its own
-			// scrim over them, so they read as "behind" the sheet without any extra hide/show logic.
-			ActionDock(
-				historyInfo = historyInfo,
-				isLoading = isLoading,
-				accent = accentColor,
-				actions = actions,
-				modifier = Modifier
-					.align(Alignment.BottomEnd)
-					.padding(end = SCREEN_PADDING, bottom = bottomContentPadding + 16.dp)
-					.dockGlow(scheme.surface),
-			)
+		// Floating action dock: a "N chapters" pill stacked above the read FAB. Both pin to the
+		// bottom-end and stay clear of the navigation bar; the modal chapters sheet draws its own
+		// scrim over them, so they read as "behind" the sheet without any extra hide/show logic.
+		ActionDock(
+			historyInfo = historyInfo,
+			isLoading = isLoading,
+			accent = accentColor,
+			actions = actions,
+			modifier = Modifier
+				.align(Alignment.BottomEnd)
+				.padding(end = SCREEN_PADDING, bottom = bottomContentPadding + 16.dp)
+				.dockGlow(scheme.surface),
+		)
 
 	}
 }

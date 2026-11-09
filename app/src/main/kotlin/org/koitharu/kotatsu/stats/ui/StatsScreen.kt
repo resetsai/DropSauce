@@ -4,6 +4,7 @@ import android.content.res.Resources
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -13,6 +14,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -94,7 +99,7 @@ fun StatsScreen(
 	// Selections are per-snapshot: an index means nothing once the period or filter changes.
 	var selectedBucket by remember(stats) { mutableIntStateOf(-1) }
 
-	Box(
+	BoxWithConstraints(
 		modifier = Modifier
 			.fillMaxSize()
 			.nestedScroll(rememberNestedScrollInteropConnection()),
@@ -109,7 +114,8 @@ fun StatsScreen(
 					.align(Alignment.TopCenter),
 			)
 		}
-		LazyColumn(
+		LazyVerticalGrid(
+			columns = GridCells.Fixed(if (maxWidth >= 760.dp * LocalDensity.current.fontScale.coerceAtLeast(1f)) 2 else 1),
 			modifier = Modifier
 				.fillMaxSize()
 				// cut cards under the toolbar with a card's own radius, at a card's own edges
@@ -117,7 +123,7 @@ fun StatsScreen(
 			contentPadding = PaddingValues(top = 8.dp, bottom = bottomInset + 32.dp),
 			verticalArrangement = Arrangement.spacedBy(10.dp),
 		) {
-			item("filters") {
+			item("filters", span = { GridItemSpan(maxLineSpan) }) {
 				LazyRow(
 					modifier = Modifier.fillMaxWidth(),
 					contentPadding = PaddingValues(horizontal = STATS_PADDING),
@@ -153,8 +159,8 @@ fun StatsScreen(
 			}
 
 			if (stats.isEmpty) {
-				item("empty") { StatsEmptyState() }
-				return@LazyColumn
+				if (!isLoading) item("empty", span = { GridItemSpan(maxLineSpan) }) { StatsEmptyState() }
+				return@LazyVerticalGrid
 			}
 
 			item("activity") {
@@ -267,7 +273,7 @@ fun StatsScreen(
 			}
 
 			if (stats.records.isNotEmpty()) {
-				item("top-manga") {
+				item("top-manga", span = { GridItemSpan(maxLineSpan) }) {
 					TopMangaSection(
 						stats = stats,
 						imageLoader = imageLoader,

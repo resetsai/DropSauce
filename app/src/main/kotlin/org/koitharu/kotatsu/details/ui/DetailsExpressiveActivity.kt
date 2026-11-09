@@ -1,11 +1,10 @@
 package org.koitharu.kotatsu.details.ui
 
-import android.app.assist.AssistContent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -30,7 +29,6 @@ import org.koitharu.kotatsu.core.ui.util.ReversibleActionObserver
 import org.koitharu.kotatsu.core.util.ext.getThemeColor
 import org.koitharu.kotatsu.core.util.ext.observe
 import org.koitharu.kotatsu.core.util.ext.observeEvent
-import org.koitharu.kotatsu.core.util.ext.toUriOrNull
 import org.koitharu.kotatsu.parsers.util.nullIfEmpty
 import org.koitharu.kotatsu.databinding.ActivityDetailsExpressiveBinding
 import org.koitharu.kotatsu.download.ui.worker.DownloadStartedObserver
@@ -119,10 +117,6 @@ class DetailsExpressiveActivity :
 			.observeEvent(this, DownloadStartedObserver(viewBinding.composeView))
 	}
 
-	override fun onProvideAssistContent(outContent: AssistContent) {
-		super.onProvideAssistContent(outContent)
-		viewModel.getMangaOrNull()?.publicUrl?.toUriOrNull()?.let { outContent.webUri = it }
-	}
 
 	override fun isNsfwContent(): Flow<Boolean> =
 		viewModel.manga.map { it?.contentRating == ContentRating.ADULT }
@@ -166,18 +160,18 @@ class DetailsExpressiveActivity :
 		viewBinding.composeView.setContent {
 			org.koitharu.kotatsu.settings.compose.DropSauceTheme {
 				val density = androidx.compose.ui.platform.LocalDensity.current
-				val details by viewModel.mangaDetails.collectAsState()
-				val history by viewModel.historyInfo.collectAsState()
-				val loading by viewModel.isLoading.collectAsState()
-				val favs by viewModel.favouriteCategories.collectAsState()
-				val scrob by viewModel.scrobblingInfo.collectAsState()
-				val related by viewModel.relatedManga.collectAsState()
-				val localSize by viewModel.localSize.collectAsState()
-				val srcTitle by viewModel.cachedSourceTitle.collectAsState()
-				val coverUrl by viewModel.coverUrl.collectAsState()
-				val coverRefreshes by viewModel.coverRefreshes.collectAsState()
-				val backdropUrl by viewModel.backdropUrl.collectAsState()
-				val tags by viewModel.tags.collectAsState()
+				val details by viewModel.mangaDetails.collectAsStateWithLifecycle()
+				val history by viewModel.historyInfo.collectAsStateWithLifecycle()
+				val loading by viewModel.isLoading.collectAsStateWithLifecycle()
+				val favs by viewModel.favouriteCategories.collectAsStateWithLifecycle()
+				val scrob by viewModel.scrobblingInfo.collectAsStateWithLifecycle()
+				val related by viewModel.relatedManga.collectAsStateWithLifecycle()
+				val localSize by viewModel.localSize.collectAsStateWithLifecycle()
+				val srcTitle by viewModel.cachedSourceTitle.collectAsStateWithLifecycle()
+				val coverUrl by viewModel.coverUrl.collectAsStateWithLifecycle()
+				val coverRefreshes by viewModel.coverRefreshes.collectAsStateWithLifecycle()
+				val backdropUrl by viewModel.backdropUrl.collectAsStateWithLifecycle()
+				val tags by viewModel.tags.collectAsStateWithLifecycle()
 				val favLabel = favs.takeIf { it.isNotEmpty() }?.joinToString { it.title }
 
 				val isBackdropEnabled by rememberBooleanPref(AppSettings.KEY_DETAILS_BACKDROP, true)

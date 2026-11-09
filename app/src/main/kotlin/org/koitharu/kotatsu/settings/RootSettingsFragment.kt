@@ -1,48 +1,27 @@
 package org.koitharu.kotatsu.settings
 
 import android.os.Bundle
+import org.koitharu.kotatsu.core.ui.ReadingPanes
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import org.koitharu.kotatsu.settings.compose.BaseComposeSettingsFragment
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withLink
-import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import dagger.hilt.android.AndroidEntryPoint
 import org.koitharu.kotatsu.R
-import org.koitharu.kotatsu.core.nav.router
 import org.koitharu.kotatsu.settings.compose.CategoryPalette
 import org.koitharu.kotatsu.settings.compose.DropSauceTheme
 import org.koitharu.kotatsu.settings.compose.SettingsGroup
 import org.koitharu.kotatsu.settings.compose.SettingsItem
 import org.koitharu.kotatsu.settings.compose.SettingsScaffold
 
-/**
- * Redesigned settings landing screen — Compose-based, modeled after PixelPlayer's settings.
- * Uses M3 LargeTopAppBar (collapses on scroll) and a single rounded SettingsGroup with the
- * dynamic-corner-radius pattern for the 9 section cards.
- *
- * Hides the host SettingsActivity's MaterialToolbar while attached, since we draw our own
- * top bar inside Compose. Sub-screens still use the activity's toolbar.
- */
 @AndroidEntryPoint
 class RootSettingsFragment : BaseComposeSettingsFragment(R.string.settings) {
 
@@ -102,29 +81,33 @@ private enum class SettingsSection(
 private fun RootSettingsContent(
 	onSectionClick: (SettingsSection) -> Unit,
 ) {
-	val ctx = LocalContext.current
-	SettingsScaffold {
-		item {
-			SettingsGroup {
-				// SettingsGroup's DSL block is NOT @Composable — @Composable calls
-				// (stringResource, MaterialTheme.colorScheme, …) only happen inside
-				// each `item { pos -> ... }` body which IS @Composable.
-				SettingsSection.values().forEach { section ->
-					item { pos ->
-						val subtitle = section.summaryRes.joinToString { ctx.getString(it) }
-						SettingsItem(
-							title = stringResource(section.titleRes),
-							subtitle = subtitle,
-							icon = section.iconRes,
-							iconColors = CategoryPalette.forKey(section.paletteKey),
-							tintIcon = section.tintIcon,
-							shape = pos.shape,
-							onClick = { onSectionClick(section) },
-						)
-					}
-				}
-			}
-		}
-		item { Spacer(Modifier.height(32.dp).fillMaxWidth()) }
-	}
+    SettingsScaffold {
+        item {
+            ReadingPanes(leading = {
+                SectionGroup(R.string.epub_reading_tab, listOf(SettingsSection.READER, SettingsSection.APPEARANCE, SettingsSection.STATISTICS), onSectionClick)
+            }, trailing = {
+                SectionGroup(R.string.local_storage, listOf(SettingsSection.STORAGE, SettingsSection.BACKUP), onSectionClick)
+            })
+        }
+    }
+}
+
+@Composable
+private fun SectionGroup(title: Int, sections: List<SettingsSection>, onClick: (SettingsSection) -> Unit) {
+    val context = LocalContext.current
+    SettingsGroup(modifier = Modifier.fillMaxWidth(), title = stringResource(title)) {
+        sections.forEach { section ->
+            item { pos ->
+                SettingsItem(
+                    title = stringResource(section.titleRes),
+                    subtitle = section.summaryRes.joinToString { context.getString(it) },
+                    icon = section.iconRes,
+                    iconColors = CategoryPalette.forKey(section.paletteKey),
+                    tintIcon = section.tintIcon,
+                    shape = pos.shape,
+                    onClick = { onClick(section) },
+                )
+            }
+        }
+    }
 }

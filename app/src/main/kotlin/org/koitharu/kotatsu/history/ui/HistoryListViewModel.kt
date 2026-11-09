@@ -37,8 +37,6 @@ import org.koitharu.kotatsu.list.ui.model.EmptyState
 import org.koitharu.kotatsu.list.ui.model.ListHeader
 import org.koitharu.kotatsu.list.ui.model.ListModel
 import org.koitharu.kotatsu.list.ui.model.LoadingState
-import org.koitharu.kotatsu.list.ui.model.TIP_UI_SCALING
-import org.koitharu.kotatsu.list.ui.model.uiScalingTip
 import org.koitharu.kotatsu.list.ui.model.toErrorState
 import org.koitharu.kotatsu.mihon.MihonExtensionManager
 import org.koitharu.kotatsu.parsers.model.Manga
@@ -95,11 +93,10 @@ class HistoryListViewModel @Inject constructor(
 		observeHistory(),
 		isGroupingEnabled,
 		observeListModeWithTriggers(),
-		settings.observeAsFlow(AppSettings.KEY_TIPS_CLOSED) { isTipEnabled(TIP_UI_SCALING) },
-	) { list, grouped, mode, isScalingTipVisible ->
+	) { list, grouped, mode ->
 		// Filters are read here rather than combined in: observeHistory() already re-queries on every
 		// filter change, and a second input would render the chips one frame ahead of their results.
-		mapList(list, grouped, mode, quickFilter.appliedOptions.value, isScalingTipVisible)
+		mapList(list, grouped, mode, quickFilter.appliedOptions.value)
 	}.distinctUntilChanged().onEach {
 		isPaginationReady.set(true)
 	}.catch { e ->
@@ -110,10 +107,6 @@ class HistoryListViewModel @Inject constructor(
 
 	override fun onRetry() = Unit
 
-	/** Shared with Favourites: dismissing it on either screen dismisses it on both. */
-	fun dismissScalingTip() {
-		settings.closeTip(TIP_UI_SCALING)
-	}
 
 	fun clearHistory(minDate: Instant?) {
 		launchJob(Dispatchers.Default) {
@@ -177,7 +170,6 @@ class HistoryListViewModel @Inject constructor(
 		grouped: Boolean,
 		mode: ListMode,
 		filters: Set<ListFilterOption>,
-		isScalingTipVisible: Boolean,
 	): List<ListModel> {
 		if (list.isEmpty()) {
 			return if (filters.isEmpty()) {
@@ -187,9 +179,6 @@ class HistoryListViewModel @Inject constructor(
 			}
 		}
 		val result = ArrayList<ListModel>((if (grouped) (list.size * 1.4).toInt() else list.size) + 3)
-		if (isScalingTipVisible) {
-			result += uiScalingTip
-		}
 		quickFilter.filterItem(filters)?.let(result::add)
 		val order = sortOrder.value
 		var prevHeader: ListHeader? = null

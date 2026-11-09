@@ -178,9 +178,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), AppBarOwner, BottomNav
 			}
 		}
 		navigationDelegate.onCreate(this, savedInstanceState)
-		viewBinding.textViewTitle?.let { tv ->
-			navigationDelegate.observeTitle().observe(this) { tv.text = it }
-		}
 
 		addMainOverflowMenuProvider(MainMenuProvider(viewModel))
 
@@ -231,6 +228,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), AppBarOwner, BottomNav
 		fromUser: Boolean,
 		transition: MainNavigationDelegate.TabTransition,
 	) {
+		viewBinding.textViewTitle.text = navigationDelegate.titleFor(fragment)
+		viewBinding.textViewTitle.isVisible = resources.configuration.screenHeightDp >= 480
 		adjustFabVisibility(topFragment = fragment)
 		adjustAppbar(topFragment = fragment, transition = transition)
 		if (fromUser) {

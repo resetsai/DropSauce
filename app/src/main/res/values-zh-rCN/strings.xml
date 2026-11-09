@@ -714,4 +714,7 @@
     <string name="offline_source_unavailable">此书源无法离线访问。请导入本地文件阅读。</string>
     <string name="offline_sources_title">无法访问的书源</string>
     <string name="offline_sources_message">离线版无法访问以下在线书源：\n%1$s</string>
+    <string name="search_offline_books">搜索书库</string>
+    <string name="library_import_hint">从设备导入 EPUB、漫画压缩包或 PDF。</string>
+    <string name="offline_delete_read_chapters">已读章节将从设备中永久删除。若要恢复导入的内容，你需要保留原文件。</string>
 </resources>

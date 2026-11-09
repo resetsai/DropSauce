@@ -1,0 +1,11 @@
+# Reading surfaces
+
+Use the book, its title and the current reading position as the identifiable subjects. On the shelf, use the real cover when available. The original vector bookplate, a cloth spine with three printed leaves, stands in for an absent cover. It takes its inks from the active Material palette. The empty bird belongs to a collection; it is not a book cover.
+
+- **Library and return paths:** show the destination above the phone search field; collapse the heading with the app bar. A short landscape window reserves its height for books. Quick taps select immediately and move the indicator over 150 ms using system animation scaling. Keep long press, drag, reselect, labels, optional legacy navigation and continue reading.
+- **Book details:** put identity, cover and favorite together. Give progress, synopsis, tags and file information a second column only if both columns have room at the current font scale. Keep chapter and read actions reachable. A missing cover has no full-screen image action.
+- **Reading:** the content gets the quietest surface. Pagination and text rendering share a gutter calculation, preserving the user's wider margins and limiting a tablet text column to 680 dp. Comic pages keep the selected scaling mode. The primary speech transport has a different silhouette from the two skip buttons.
+- **Search, history, bookmarks:** name the searchable local collection. Keep action targets distinct; an excerpt grows with its text, while an image bookmark keeps its thumbnail. Headers, body text and the illustrated empty state have separate roles.
+- **Settings and statistics:** group reading preferences separately from local file management. In a settings split view, use the available pane width, not the whole display width. On wide statistics screens, place the activity chart alongside the metrics; period filters and rankings span the grid. Do not show an empty result before loading finishes.
+
+Reference: the Device Atlas chat and its Ani/Kazumi/PiliPlus research informed task grouping, image treatment and interruptible selection. The native reader keeps its own UI and assets. Numerical transition duration is a design parameter, not a frame-time measurement.

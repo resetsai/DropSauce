@@ -22,11 +22,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.navigationrail.NavigationRailView
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.channels.trySendBlocking
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import org.koitharu.kotatsu.R
 import org.koitharu.kotatsu.bookmarks.ui.AllBookmarksFragment
@@ -154,15 +150,7 @@ class MainNavigationDelegate(
 		}
 	}
 
-	fun observeTitle() = callbackFlow {
-		val listener = OnFragmentChangedListener { f, _, _ ->
-			trySendBlocking(getItemId(f))
-		}
-		addOnFragmentChangedListener(listener)
-		awaitClose { removeOnFragmentChangedListener(listener) }
-	}.map {
-		navBar.menu.findItem(it)?.title
-	}
+	fun titleFor(fragment: Fragment): CharSequence? = navBar.menu.findItem(getItemId(fragment))?.title
 
 	fun setCounter(item: NavItem, counter: Int) {
 		setCounter(item.id, counter)
@@ -205,9 +193,6 @@ class MainNavigationDelegate(
 		listeners.add(listener)
 	}
 
-	fun removeOnFragmentChangedListener(listener: OnFragmentChangedListener) {
-		listeners.remove(listener)
-	}
 
 	private fun onNavigationItemSelected(@IdRes itemId: Int): Boolean {
 		val newFragment = when (itemId) {

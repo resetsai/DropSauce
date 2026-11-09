@@ -1,0 +1,11 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="130dp" android:height="180dp" android:viewportWidth="130" android:viewportHeight="180">
+    <!-- Cloth spine and a fan of leaves, in the current theme's inks. -->
+    <path android:fillColor="?attr/colorSecondaryContainer" android:pathData="M0,0h130v180H0z"/>
+    <path android:fillColor="?attr/colorSecondary" android:pathData="M0,0h9v180H0z"/>
+    <path android:fillColor="?attr/colorOnSecondaryContainer" android:fillAlpha="0.13" android:pathData="M12,0h1v180h-1z M17,0h1v180h-1z"/>
+    <path android:fillColor="?attr/colorTertiary" android:pathData="M70,108C48,108 34,93 34,70c22,0 36,15 36,38z"/>
+    <path android:fillColor="?attr/colorPrimary" android:pathData="M70,108C52,87 54,60 70,45c17,16 19,43 0,63z"/>
+    <path android:fillColor="?attr/colorSecondary" android:pathData="M70,108c0,-23 14,-38 36,-38c0,23 -14,38 -36,38z"/>
+    <path android:strokeColor="?attr/colorOnSecondaryContainer" android:strokeWidth="1.5" android:pathData="M54,116h32"/>
+</vector>

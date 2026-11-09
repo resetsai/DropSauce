@@ -7,7 +7,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.IdRes
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -18,6 +18,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.material3.LocalTextStyle
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koitharu.kotatsu.core.prefs.NavItem
 import org.koitharu.kotatsu.main.ui.nav.FloatingNavBar
@@ -70,16 +75,27 @@ class FloatingBottomNavigationView @JvmOverloads constructor(
 				val labeled by labeledState.collectAsState()
 				val navColors by navColorsState.collectAsState()
 				val showContinue by continueVisibleState.collectAsState()
-				Box(
+				BoxWithConstraints(
 					modifier = Modifier
 						.fillMaxWidth()
 						.padding(horizontal = 12.dp, vertical = 8.dp),
 					contentAlignment = Alignment.Center,
 				) {
+					// Budget for every translated label before switching tabs. Keep the resume
+					// action and tab hit targets intact when text grows beyond the dock.
+					val measure = rememberTextMeasurer()
+					val density = LocalDensity.current
+					val style = LocalTextStyle.current.merge(fontSize = 14.sp, lineHeight = 20.sp)
+					val longest = items.maxOfOrNull { item ->
+						val text = stringResource(item.titleRes)
+						with(density) { measure.measure(text, style = style, maxLines = 1).size.width.toDp() }
+					} ?: 0.dp
+					val buttons = 16.dp + 52.dp * items.size + 4.dp * (items.size - 1).coerceAtLeast(0)
+					val required = buttons + 8.dp + longest + if (showContinue) 64.dp else 0.dp
 					FloatingNavBar(
 						items = items,
 						selectedId = selectedId,
-						showLabels = labeled,
+						showLabels = labeled && maxWidth >= required,
 						colors = navColors,
 						onItemSelected = { id -> this@FloatingBottomNavigationView.selectedItemId = id },
 						onItemReselected = { id ->

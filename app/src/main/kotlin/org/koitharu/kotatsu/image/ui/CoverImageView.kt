@@ -132,7 +132,7 @@ class CoverImageView @JvmOverloads constructor(
 		manga: Manga?,
 	) = enqueueRequest(
 		newRequestBuilder()
-			.data(coverUrl)
+			.data(coverUrl?.takeIf { it.isNotBlank() } ?: R.drawable.bookplate_offline)
 			.mangaExtra(manga)
 			.stableMangaCoverKey(manga, coverUrl)
 			.build(),

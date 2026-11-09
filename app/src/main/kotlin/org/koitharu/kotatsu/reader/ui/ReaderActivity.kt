@@ -1,6 +1,5 @@
 package org.koitharu.kotatsu.reader.ui
 
-import android.app.assist.AssistContent
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build
@@ -83,7 +82,6 @@ import org.koitharu.kotatsu.core.util.ext.observe
 import org.koitharu.kotatsu.core.util.ext.observeEvent
 import org.koitharu.kotatsu.core.util.ext.postDelayed
 import org.koitharu.kotatsu.core.util.ext.setContentDescriptionAndTooltip
-import org.koitharu.kotatsu.core.util.ext.toUriOrNull
 import org.koitharu.kotatsu.core.util.ext.zipWithPrevious
 import org.koitharu.kotatsu.databinding.ActivityReaderBinding
 import org.koitharu.kotatsu.details.ui.pager.ChaptersPagesViewModel
@@ -373,10 +371,6 @@ class ReaderActivity :
         super.onDestroy()
     }
 
-    override fun onProvideAssistContent(outContent: AssistContent) {
-        super.onProvideAssistContent(outContent)
-        viewModel.getMangaOrNull()?.publicUrl?.toUriOrNull()?.let { outContent.webUri = it }
-    }
 
     override fun isNsfwContent(): Flow<Boolean> = viewModel.isMangaNsfw
 

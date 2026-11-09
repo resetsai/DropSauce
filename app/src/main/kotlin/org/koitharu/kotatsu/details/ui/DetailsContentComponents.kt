@@ -62,14 +62,11 @@ import android.graphics.Typeface
 import android.text.Spanned
 import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
-import android.text.style.URLSpan
 import io.noties.markwon.core.spans.EmphasisSpan
 import io.noties.markwon.core.spans.StrongEmphasisSpan
 import android.text.style.UnderlineSpan
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -105,16 +102,15 @@ internal fun DescriptionCard(
 	details: MangaDetails?,
 	accent: Color,
 ) {
-	val linkColor = MaterialTheme.colorScheme.primary
 	// The appearance setting only decides how a long description *starts*; tapping still toggles it
 	// either way, so turning collapsing off doesn't cost you the ability to fold a wall of text away.
 	val collapseEnabled by rememberBooleanPref(AppSettings.KEY_COLLAPSE_DESCRIPTION, true)
 	var expanded by rememberSaveable(collapseEnabled) { mutableStateOf(!collapseEnabled) }
 	var hasOverflow by remember { mutableStateOf(false) }
-	// Links only become tappable once expanded, so a tap on a collapsed description always expands it.
-	val rich = remember(description, linkColor, expanded) {
-		description?.toAnnotatedString(linkColor, linksClickable = expanded) ?: AnnotatedString("")
+	val rich = remember(description) {
+		description?.toAnnotatedString() ?: AnnotatedString("")
 	}
+	if (rich.isBlank() && details?.getLocale() == null && !manga.hasRating) return
 	val text = rich.text
 	val cardColor = MaterialTheme.colorScheme.surfaceContainerHigh
 	val context = LocalContext.current
@@ -204,8 +200,8 @@ internal fun DescriptionCard(
 }
 
 // Compose Text can't draw android Spans, so map the ones descriptions use (bold/italic/underline/
-// strike/links) onto an AnnotatedString. Links become tappable via LinkAnnotation.
-private fun CharSequence.toAnnotatedString(linkColor: Color, linksClickable: Boolean): AnnotatedString {
+// strike) onto an AnnotatedString. Imported URLs remain plain text.
+private fun CharSequence.toAnnotatedString(): AnnotatedString {
 	val trimmed = trim()
 	if (trimmed !is Spanned) return AnnotatedString(trimmed.toString())
 	return buildAnnotatedString {
@@ -226,14 +222,6 @@ private fun CharSequence.toAnnotatedString(linkColor: Color, linksClickable: Boo
 				is EmphasisSpan -> addStyle(SpanStyle(fontStyle = FontStyle.Italic), start, end)
 				is UnderlineSpan -> addStyle(SpanStyle(textDecoration = TextDecoration.Underline), start, end)
 				is StrikethroughSpan -> addStyle(SpanStyle(textDecoration = TextDecoration.LineThrough), start, end)
-				is URLSpan -> {
-					val style = SpanStyle(color = linkColor, textDecoration = TextDecoration.Underline)
-					if (linksClickable) {
-						addLink(LinkAnnotation.Url(span.url, TextLinkStyles(style)), start, end)
-					} else {
-						addStyle(style, start, end)
-					}
-				}
 			}
 		}
 	}
