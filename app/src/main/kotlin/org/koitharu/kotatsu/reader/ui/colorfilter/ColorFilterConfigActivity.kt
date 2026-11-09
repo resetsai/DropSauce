@@ -5,6 +5,10 @@ import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.ImageView
+import org.koitharu.kotatsu.core.nav.AppRouter
+import org.koitharu.kotatsu.core.model.parcelable.ParcelableManga
+import org.koitharu.kotatsu.core.model.parcelable.ParcelableMangaPage
+import org.koitharu.kotatsu.core.util.ext.getParcelableExtraCompat
 import androidx.activity.viewModels
 import androidx.core.view.WindowInsetsCompat
 import coil3.ImageLoader
@@ -44,6 +48,12 @@ class ColorFilterConfigActivity :
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
+		if (intent.getParcelableExtraCompat<ParcelableManga>(AppRouter.KEY_MANGA) == null ||
+			intent.getParcelableExtraCompat<ParcelableMangaPage>(AppRouter.KEY_PAGES) == null
+		) {
+			finish()
+			return
+		}
 		setContentView(ActivityColorFilterBinding.inflate(layoutInflater))
 		setDisplayHomeAsUp(isEnabled = true, showUpAsClose = true)
 		viewBinding.sliderBrightness.addOnChangeListener(this)
