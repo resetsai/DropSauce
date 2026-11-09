@@ -757,4 +757,5 @@
     <string name="cover_source_gallery">从相册选择</string>
     <string name="cover_source_file">从文件选择</string>
     <string name="cover_source_page">使用书中页面</string>
+    <string name="continue_reading">继续阅读</string>
 </resources>

@@ -549,4 +549,5 @@
     <string name="offline_source_unavailable">此書源無法離線存取。請匯入本機檔案閱讀。</string>
     <string name="offline_sources_title">無法存取的書源</string>
     <string name="offline_sources_message">離線版無法存取以下線上書源：\n%1$s</string>
+    <string name="continue_reading">繼續閱讀</string>
 </resources>
