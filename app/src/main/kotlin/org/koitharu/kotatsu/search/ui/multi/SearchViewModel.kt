@@ -13,21 +13,15 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
-import kotlinx.coroutines.sync.withPermit
 import org.koitharu.kotatsu.R
 import org.koitharu.kotatsu.core.model.LocalMangaSource
 import org.koitharu.kotatsu.core.model.UnknownMangaSource
-import org.koitharu.kotatsu.core.model.isNovelSource
 import org.koitharu.kotatsu.core.nav.AppRouter
-import org.koitharu.kotatsu.core.prefs.AppSettings
 import org.koitharu.kotatsu.core.prefs.ListMode
 import org.koitharu.kotatsu.core.ui.BaseViewModel
 import org.koitharu.kotatsu.core.util.ext.append
 import org.koitharu.kotatsu.core.util.ext.printStackTraceDebug
-import org.koitharu.kotatsu.explore.data.MangaSourcesRepository
 import org.koitharu.kotatsu.favourites.domain.FavouritesRepository
 import org.koitharu.kotatsu.history.data.HistoryRepository
 import org.koitharu.kotatsu.list.domain.MangaListMapper
@@ -41,28 +35,18 @@ import org.koitharu.kotatsu.search.domain.SearchKind
 import org.koitharu.kotatsu.search.domain.SearchV2Helper
 import javax.inject.Inject
 
-private const val MAX_PARALLELISM = 4
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
 	savedStateHandle: SavedStateHandle,
 	private val mangaListMapper: MangaListMapper,
 	private val searchHelperFactory: SearchV2Helper.Factory,
-	private val sourcesRepository: MangaSourcesRepository,
 	private val historyRepository: HistoryRepository,
 	private val favouritesRepository: FavouritesRepository,
-	private val settings: AppSettings,
 ) : BaseViewModel() {
 
 	val query = savedStateHandle.get<String>(AppRouter.KEY_QUERY).orEmpty()
 	val kind = savedStateHandle.get<SearchKind>(AppRouter.KEY_KIND) ?: SearchKind.SIMPLE
-	/** Manga vs novel sources. Picked from the chip row on this screen and remembered for next time. */
-	val novelScope = MutableStateFlow(false)
-	private val isNovelScope: Boolean
-		get() = novelScope.value
-
-	private val pinnedOnly = MutableStateFlow(settings.isSearchPinnedOnly)
-	private val localOnly = MutableStateFlow(settings.isSearchLocalOnly)
 	private val results = MutableStateFlow<List<SearchResultsListModel>>(emptyList())
 
 	// Not `isLoading`: that StateFlow can flip true->false before this flow is even subscribed (a search
@@ -74,11 +58,6 @@ class SearchViewModel @Inject constructor(
 
 	/** Bumped per search so a cancelled run's cleanup cannot clear the flag of the run replacing it. */
 	private var searchGeneration = 0
-
-	/** Whether any search filter is on, for the toolbar badge. */
-	val hasActiveFilters: StateFlow<Boolean> = combine(pinnedOnly, localOnly) { pinned, local ->
-		pinned || local
-	}.stateIn(viewModelScope + Dispatchers.Default, SharingStarted.Eagerly, false)
 
 	val list: StateFlow<List<ListModel>> = combine(
 		results,
@@ -127,36 +106,6 @@ class SearchViewModel @Inject constructor(
 		doSearch()
 	}
 
-	val isPinnedOnly: Boolean
-		get() = pinnedOnly.value
-
-	val isLocalOnly: Boolean
-		get() = localOnly.value
-
-	fun setPinnedOnly(value: Boolean) {
-		if (pinnedOnly.value != value) {
-			settings.isSearchPinnedOnly = value
-			pinnedOnly.value = value
-			retry()
-		}
-	}
-
-	fun setNovelScope(value: Boolean) {
-		if (novelScope.value != value) {
-			settings.isGlobalSearchNovelScope = value
-			novelScope.value = value
-			retry()
-		}
-	}
-
-	fun setLocalOnly(value: Boolean) {
-		if (localOnly.value != value) {
-			settings.isSearchLocalOnly = value
-			localOnly.value = value
-			retry()
-		}
-	}
-
 	private fun doSearch() {
 		val prevJob = searchJob
 		val generation = ++searchGeneration
@@ -179,7 +128,6 @@ class SearchViewModel @Inject constructor(
 
 	private suspend fun searchHistory(): SearchResultsListModel? = runCatchingCancellable {
 		historyRepository.search(query, kind, Int.MAX_VALUE)
-			.filter { it.source.isNovelSource == isNovelScope }
 	}.fold(
 		onSuccess = { result ->
 			if (result.isNotEmpty()) {
@@ -209,7 +157,6 @@ class SearchViewModel @Inject constructor(
 
 	private suspend fun searchFavorites(): SearchResultsListModel? = runCatchingCancellable {
 		favouritesRepository.search(query, kind, Int.MAX_VALUE)
-			.filter { it.source.isNovelSource == isNovelScope }
 	}.fold(
 		onSuccess = { result ->
 			if (result.isNotEmpty()) {

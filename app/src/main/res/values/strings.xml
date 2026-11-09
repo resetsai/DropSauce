@@ -1327,4 +1327,7 @@
     <string name="eye_reminder_text">You\'ve been reading for %s. Take a short break and give your eyes some rest.</string>
     <string name="dismiss">Dismiss</string>
     <string name="tts_offline_voice_required">Select an installed offline voice in Android text-to-speech settings.</string>
+    <string name="offline_source_unavailable">This source is unavailable offline. Import a local copy to read this title.</string>
+    <string name="offline_sources_title">Unavailable sources</string>
+    <string name="offline_sources_message">The following online sources are unavailable in the offline reader:\n%1$s</string>
 </resources>

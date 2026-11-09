@@ -546,4 +546,7 @@
     <string name="download_new_chapters">下載新的漫畫章節</string>
     <string name="auto_double_foldable">摺疊設備自動雙頁</string>
     <string name="tts_offline_voice_required">請在系統的文字轉語音設定中選擇已安裝的離線語音。</string>
+    <string name="offline_source_unavailable">此書源無法離線存取。請匯入本機檔案閱讀。</string>
+    <string name="offline_sources_title">無法存取的書源</string>
+    <string name="offline_sources_message">離線版無法存取以下線上書源：\n%1$s</string>
 </resources>

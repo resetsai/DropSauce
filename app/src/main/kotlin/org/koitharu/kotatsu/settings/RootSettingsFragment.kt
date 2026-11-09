@@ -125,7 +125,6 @@ private fun RootSettingsContent(
 				}
 			}
 		}
-		item { Spacer(Modifier.height(8.dp).fillMaxWidth()) }
-		item { Spacer(Modifier.height(24.dp).fillMaxWidth()) }
+		item { Spacer(Modifier.height(32.dp).fillMaxWidth()) }
 	}
 }

@@ -99,7 +99,7 @@ class ExploreFragment :
 			layoutManager = LinearLayoutManager(context)
 			addItemDecoration(TypedListSpacingDecoration(context, false))
 		}
-		header.buttonManage.setOnClickListener { router.openSourcesCatalog() }
+		header.buttonManage.visibility = View.GONE
 
 		binding.pager.adapter = ExploreSourcesPagerAdapter(::onPageCreated)
 		binding.pager.offscreenPageLimit = 1
@@ -329,8 +329,6 @@ class ExploreFragment :
 	override fun onListHeaderClick(item: ListHeader, view: View) {
 		if (item.payload == R.id.nav_suggestions) {
 			router.openSuggestions()
-		} else {
-			router.openSourcesCatalog()
 		}
 	}
 
@@ -372,9 +370,7 @@ class ExploreFragment :
 
 	override fun onRetryClick(error: Throwable) = Unit
 
-	override fun onEmptyActionClick() {
-		router.openSourcesCatalog()
-	}
+	override fun onEmptyActionClick() = Unit
 
 	override fun onSelectionChanged(controller: ListSelectionController, count: Int) {
 		pages.forEach { it?.invalidateItemDecorations() }

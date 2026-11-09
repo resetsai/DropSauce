@@ -55,7 +55,7 @@ import org.koitharu.kotatsu.settings.compose.rememberIntPref
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ServicesSettingsFragment : BaseComposeSettingsFragment(R.string.services) {
+class ServicesSettingsFragment : BaseComposeSettingsFragment(R.string.reading_stats) {
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
@@ -105,7 +105,7 @@ private fun ServicesScreen(onOpenStatistics: () -> Unit) {
 
 	SettingsScaffold {
 		item {
-			SettingsGroup(title = "General") {
+			SettingsGroup() {
 				item { pos ->
 					// Combined row: tapping the row opens the statistics page, the trailing
 					// switch (split off by a divider) toggles collection on/off.

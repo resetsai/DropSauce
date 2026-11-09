@@ -703,18 +703,6 @@ class AppSettings @Inject constructor(@ApplicationContext context: Context) {
 			putStringSet(KEY_NOVEL_SOURCE_IDS, value.mapToSet { it.toString() })
 		}
 
-	var isGlobalSearchNovelScope: Boolean
-		get() = prefs.getBoolean(KEY_GLOBAL_SEARCH_NOVEL_SCOPE, false)
-		set(value) = prefs.edit { putBoolean(KEY_GLOBAL_SEARCH_NOVEL_SCOPE, value) }
-
-	var isSearchPinnedOnly: Boolean
-		get() = prefs.getBoolean(KEY_SEARCH_PINNED_ONLY, false)
-		set(value) = prefs.edit { putBoolean(KEY_SEARCH_PINNED_ONLY, value) }
-
-	var isSearchLocalOnly: Boolean
-		get() = prefs.getBoolean(KEY_SEARCH_LOCAL_ONLY, false)
-		set(value) = prefs.edit { putBoolean(KEY_SEARCH_LOCAL_ONLY, value) }
-
 	var isShizukuInstallerEnabled: Boolean
 		get() = prefs.getBoolean(KEY_SHIZUKU_INSTALLER, false)
 		set(value) = prefs.edit {
@@ -1526,9 +1514,6 @@ class AppSettings @Inject constructor(@ApplicationContext context: Context) {
 		const val KEY_COLLAPSE_DESCRIPTION = "description_collapse"
 		const val KEY_MANGA_LIST_BADGES = "manga_list_badges"
 		const val KEY_NOVEL_SOURCE_IDS = "novel_source_ids"
-		const val KEY_GLOBAL_SEARCH_NOVEL_SCOPE = "global_search_novel_scope"
-		const val KEY_SEARCH_PINNED_ONLY = "search_pinned_only"
-		const val KEY_SEARCH_LOCAL_ONLY = "search_local_only"
 		const val KEY_SHIZUKU_INSTALLER = "shizuku_installer"
 		const val KEY_PRIVATE_INSTALLER = "private_installer"
 		const val KEY_AUTO_UPDATE_EXTENSIONS = "auto_update_extensions"

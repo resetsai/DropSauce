@@ -126,21 +126,8 @@ class AppRouter private constructor(
 
     fun openList(source: MangaSource, filter: MangaListFilter?, sortOrder: SortOrder?) {
         val context = contextOrNull() ?: return
-        // The extension is not installed, so the list could only ever show an
-        // UnsupportedSourceException — offer the extensions catalog instead of opening it.
         if (source.unwrap() is MissingMangaSource) {
-            showActionChoiceDialog(
-                context = context,
-                icon = R.drawable.ic_manga_source,
-                title = source.getTitle(context),
-                message = context.getString(R.string.source_not_installed),
-                actions = listOf(
-                    DialogAction(context.getString(R.string.extensions)) {
-                        openSourcesCatalog()
-                    },
-                ),
-                dismissLabel = context.getString(R.string.close),
-            )
+            android.widget.Toast.makeText(context, R.string.offline_source_unavailable, android.widget.Toast.LENGTH_LONG).show()
             return
         }
         startActivity(listIntent(context, source, filter, sortOrder))
@@ -239,7 +226,6 @@ class AppRouter private constructor(
         startActivity(suggestionsIntent(contextOrNull() ?: return))
     }
 
-    fun openSourcesCatalog(autoMigrate: Boolean = false) = Unit
 
     fun openExtensionStores() = startActivity(ExtensionStoresActivity::class.java)
 

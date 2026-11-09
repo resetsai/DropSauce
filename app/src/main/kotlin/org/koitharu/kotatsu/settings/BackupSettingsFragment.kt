@@ -37,11 +37,7 @@ import org.koitharu.kotatsu.core.ui.dialog.showConfirmDialog
 import org.koitharu.kotatsu.core.util.ext.checkNotificationPermission
 import org.koitharu.kotatsu.core.util.ext.getDisplayMessage
 import org.koitharu.kotatsu.core.util.ext.observeEvent
-import org.koitharu.kotatsu.kotatsumigration.domain.KotatsuMigrationManager
-import org.koitharu.kotatsu.kotatsumigration.domain.MigrationState
-import org.koitharu.kotatsu.kotatsumigration.ui.KotatsuMigrationService
-import org.koitharu.kotatsu.kotatsumigration.ui.showExtensionInstallPromptDialog
-import org.koitharu.kotatsu.kotatsumigration.ui.showKotatsuMigrationCompleteDialog
+import org.koitharu.kotatsu.kotatsumigration.ui.showMissingSourcesDialog
 import org.koitharu.kotatsu.settings.compose.ActionSettingsItem
 import org.koitharu.kotatsu.settings.compose.BaseComposeSettingsFragment
 import org.koitharu.kotatsu.settings.compose.DropSauceTheme
@@ -56,8 +52,6 @@ class BackupSettingsFragment : BaseComposeSettingsFragment(R.string.backup_resto
 	@Inject
 	lateinit var backupManager: MihonBackupManager
 
-	@Inject
-	lateinit var migrationManager: KotatsuMigrationManager
 
 	@Inject
 	lateinit var mihonExporter: MihonBackupExporter
@@ -102,22 +96,6 @@ class BackupSettingsFragment : BaseComposeSettingsFragment(R.string.backup_resto
 		setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
 		setContent {
 			DropSauceTheme {
-				val migrationState by migrationManager.state.collectAsState()
-				val migrationSubtitle = when (val s = migrationState) {
-					is MigrationState.Running -> stringResource(
-						R.string.kotatsu_migration_progress,
-						s.done,
-						s.total,
-					)
-
-					is MigrationState.Finished -> stringResource(
-						R.string.kotatsu_migration_result,
-						s.summary.converted,
-						s.summary.total,
-					)
-
-					MigrationState.Idle -> stringResource(R.string.migrate_from_kotatsu_summary)
-				}
 				BackupScreen(
 					onCreateBackup = {
 						createLocalBackupLauncher.launch(
@@ -139,40 +117,10 @@ class BackupSettingsFragment : BaseComposeSettingsFragment(R.string.backup_resto
 					onRestoreFromTachiyomi = {
 						restoreMihonBackupLauncher.launch(arrayOf("application/*", "*/*"))
 					},
-					migrationSubtitle = migrationSubtitle,
-					onMigrateFromKotatsu = ::confirmAndStartKotatsuMigration,
 					onExportToMihon = {
 						exportMihonBackupLauncher.launch(MihonBackupExporter.generateFileName())
 					},
 				)
-			}
-		}
-	}
-
-	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-		super.onViewCreated(view, savedInstanceState)
-		migrationManager.onStarted.observeEvent(viewLifecycleOwner) {
-			Toast.makeText(requireContext(), R.string.kotatsu_migration_started, Toast.LENGTH_SHORT).show()
-		}
-		migrationManager.onCompleted.observeEvent(viewLifecycleOwner) { summary ->
-			requireContext().showKotatsuMigrationCompleteDialog(summary)
-		}
-	}
-
-	private fun confirmAndStartKotatsuMigration() {
-		if (migrationManager.isRunning) {
-			Toast.makeText(requireContext(), R.string.kotatsu_migration_running, Toast.LENGTH_SHORT).show()
-			return
-		}
-		showConfirmDialog(
-			context = requireContext(),
-			icon = R.drawable.ic_migrate,
-			title = getString(R.string.migrate_from_kotatsu),
-			message = getString(R.string.migrate_from_kotatsu_confirm),
-			confirmLabel = getString(R.string.migrate_from_kotatsu),
-		) {
-			if (KotatsuMigrationService.start(requireContext())) {
-				Toast.makeText(requireContext(), R.string.kotatsu_migration_running, Toast.LENGTH_SHORT).show()
 			}
 		}
 	}
@@ -208,7 +156,7 @@ class BackupSettingsFragment : BaseComposeSettingsFragment(R.string.backup_resto
 			Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
 			if (result.isSuccess) {
 				restoreReport?.let {
-					requireContext().showExtensionInstallPromptDialog(it.missingSources)
+					requireContext().showMissingSourcesDialog(it.missingSources)
 					showRestoreNotification(it)
 				}
 			}
@@ -259,8 +207,6 @@ private fun BackupScreen(
 	onRestoreLocal: () -> Unit,
 	onOpenPeriodic: () -> Unit,
 	onRestoreFromTachiyomi: () -> Unit,
-	migrationSubtitle: String,
-	onMigrateFromKotatsu: () -> Unit,
 	onExportToMihon: () -> Unit,
 ) {
 	SettingsScaffold {
@@ -309,16 +255,6 @@ private fun BackupScreen(
 
 						shape = pos.shape,
 						onClick = onRestoreFromTachiyomi,
-					)
-				}
-				item { pos ->
-					ActionSettingsItem(
-						title = stringResource(R.string.migrate_from_kotatsu),
-						subtitle = migrationSubtitle,
-						icon = R.drawable.ic_backup_restore,
-
-						shape = pos.shape,
-						onClick = onMigrateFromKotatsu,
 					)
 				}
 				item { pos ->

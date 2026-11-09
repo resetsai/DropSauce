@@ -711,4 +711,7 @@
     <string name="enable_pull_gesture_summary">条漫模式下使用推拉手势切换章节</string>
     <string name="auto_double_foldable">折叠设备自动双页</string>
     <string name="tts_offline_voice_required">请在系统的文字转语音设置中选择已安装的离线语音。</string>
+    <string name="offline_source_unavailable">此书源无法离线访问。请导入本地文件阅读。</string>
+    <string name="offline_sources_title">无法访问的书源</string>
+    <string name="offline_sources_message">离线版无法访问以下在线书源：\n%1$s</string>
 </resources>

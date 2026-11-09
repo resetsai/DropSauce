@@ -59,8 +59,6 @@ class SearchMenuProvider(
 				SearchKind.TAG -> R.id.action_kind_tag
 			},
 		)?.isChecked = true
-		menu.removeItem(R.id.action_filter_pinned_only)
-		menu.removeItem(R.id.action_filter_local_only)
 		popup.setOnMenuItemClickListener(::onMenuItemSelected)
 		popup.show()
 	}

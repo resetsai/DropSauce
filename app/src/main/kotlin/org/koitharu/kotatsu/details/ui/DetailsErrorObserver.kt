@@ -28,15 +28,8 @@ class DetailsErrorObserver(
 ) {
 
 	override suspend fun emit(value: Throwable) {
-		var displayMessage = value.getDisplayMessage(host.context.resources)
-		var isRecommended = false
-		if (value is UnsupportedSourceException) {
-			val manga = value.manga
-			if (manga != null && viewModel.isSourceRecommended(manga.source.name)) {
-				isRecommended = true
-				displayMessage = host.context.resources.getString(R.string.install_extension_to_read_manga)
-			}
-		}
+		val displayMessage = if (value is UnsupportedSourceException) host.context.getString(R.string.offline_source_unavailable)
+		else value.getDisplayMessage(host.context.resources)
 
 		val snackbar = Snackbar.make(host, displayMessage, Snackbar.LENGTH_SHORT)
 		snackbar.setAnchorView(bottomSheet)
@@ -44,13 +37,7 @@ class DetailsErrorObserver(
 			snackbar.duration = Snackbar.LENGTH_INDEFINITE
 		}
 		when {
-			isRecommended -> {
-				snackbar.setAction(R.string.extensions) {
-					router()?.openSourcesCatalog()
-				}
-			}
-
-			canResolve(value) -> {
+			value !is UnsupportedSourceException && canResolve(value) -> {
 				snackbar.setAction(ExceptionResolver.getResolveStringId(value)) {
 					resolve(value)
 				}
