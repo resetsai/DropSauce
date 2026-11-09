@@ -1333,4 +1333,5 @@
     <string name="search_offline_books">Search your library</string>
     <string name="library_import_hint">Import an EPUB, comic archive or PDF from your device.</string>
     <string name="offline_delete_read_chapters">Read chapters will be permanently removed from this device. To recover imported content, you will need the original files.</string>
+    <string name="offline_history_hint">Open a book from your library to start your reading history.</string>
 </resources>

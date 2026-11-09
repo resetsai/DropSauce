@@ -717,4 +717,5 @@
     <string name="search_offline_books">搜索书库</string>
     <string name="library_import_hint">从设备导入 EPUB、漫画压缩包或 PDF。</string>
     <string name="offline_delete_read_chapters">已读章节将从设备中永久删除。若要恢复导入的内容，你需要保留原文件。</string>
+    <string name="offline_history_hint">打开书库中的书开始阅读，这里就会留下阅读记录。</string>
 </resources>

@@ -234,7 +234,7 @@ class HistoryListViewModel @Inject constructor(
 		EmptyState(
 			icon = R.drawable.ic_empty_history,
 			textPrimary = R.string.text_history_holder_primary,
-			textSecondary = R.string.text_history_holder_secondary,
+			textSecondary = R.string.offline_history_hint,
 			actionStringRes = 0,
 		)
 	}
